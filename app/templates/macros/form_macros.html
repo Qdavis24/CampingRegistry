@@ -1,0 +1,18 @@
+{% macro render_fields(form, fields, break_point) %}
+{{ form.csrf_token }}
+<div class="flex-row">
+        <div class="flex-col flex-center">
+                {% for field in fields[:break_point] %}
+                {{ field.label(class="form-label") }}
+                {{ field(class="form-field") }}
+                {% endfor %}
+        </div>
+        <div class="flex-col flex-center">
+                {% for field in fields[break_point:] %}
+                {{ field.label(class="form-label") }}
+                {{ field(class="form-field") }}
+                {% endfor %}
+        </div>
+</div>
+{{ form.submit(class="button button-medium")}}
+{% endmacro %}

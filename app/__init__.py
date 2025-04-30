@@ -1,32 +1,78 @@
 from .config import Config
 from .views import app_blueprint
-from flask import Flask, g
-import mysql.connector
+from .util_classes import User
+from flask_login import LoginManager
+from flask import Flask
+from contextlib import contextmanager
+from mysql.connector.pooling import MySQLConnectionPool
+from mysql.connector import MySQLConnection
+import logging
 
-def get_db():
-    if 'db' not in g:
-        g.db = mysql.connector.connect(
-            host=Config.MYSQL_HOST,
-            user=Config.MYSQL_USER,
-            password=Config.MYSQL_PASSWORD,
-            database=Config.MYSQL_DB
-        )
-        g.cursor = g.db.cursor(dictionary=True)
-    return g.db, g.cursor
 
-def close_db(e=None):
-    db = g.pop('db', None)
-    cursor = g.pop('cursor', None)
-    
-    if cursor is not None:
-        cursor.close()
-    
-    if db is not None:
-        db.close()
+logging.basicConfig(filename="./logs/last-run-log.txt", 
+                    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+                    level=logging.DEBUG)
+
+            
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     app.register_blueprint(app_blueprint)
-    app.teardown_appcontext(close_db)
-    return app
+    
+    
+    try:
+        dbconfig = {
+            "database": Config.MYSQL_DATABASE,
+            "user": Config.MYSQL_USER,
+            "host": Config.MYSQL_HOST,
+            "password": Config.MYSQL_PASSWORD,
+        }
+        connection_pool = MySQLConnectionPool(
+            pool_name="campsites_db_pool",
+            pool_size=10,
+            pool_reset_session=True,
+            **dbconfig
+        )
+    except Exception as e:
+        logging.error(e)
+    else:
+        app.db_pool = connection_pool
+
+        @contextmanager
+        def retrieve_db_connection():
+            """
+            yields connection and cursor then closes
+            both when exiting with"""
+            connection = None
+            cursor = None
+            try:
+                connection: MySQLConnection = app.db_pool.get_connection()
+                cursor: MySQLConnection.cursor = connection.cursor(dictionary=True)
+                yield connection, cursor
+            except Exception as e:
+                logging.error(e)
+            finally:
+                if cursor:
+                    cursor.close()
+                if connection:
+                    connection.close() 
+        app.retrieve_db_connection = retrieve_db_connection
+
+        login_manager = LoginManager(app)
+
+        @login_manager.user_loader
+        def load_user(user_id):
+            with retrieve_db_connection() as (connection, cursor):
+                try:
+                    cursor.execute("SELECT *" \
+                    "FROM user" \
+                    "WHERE user_ID = %s", (user_id,))
+                    user_dict = cursor.fetchone()
+                    user = User(**user_dict) if user_dict else None
+                except Exception as e:
+                    logging.error(e)
+            
+            return user
+            
+        return app

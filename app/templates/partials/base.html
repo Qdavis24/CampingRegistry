@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="Stylesheet" type="text/css" href="../static/styles.css">
+</head>
+
+<body class="full-screen flex-col">
+        <div class="flex flex-center hero">
+            <h1>{% block title %}{% endblock %}</h1>
+        </div>
+        {% block content %}
+        {% endblock %}
+    {% block scripts %}
+    
+    {% endblock %}
+</body>
+
+</html>

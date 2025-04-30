@@ -1,11 +1,42 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-</head>
-<body>
-   <h1> Hello Campsites</h1> 
-</body>
-</html>
+{% from "macros/form_macros.html" import render_fields %}
+{% include 'svgs/svgs.html' %}
+{% extends "./partials/base.html" %}
+{% block content %}
+<div class="flex-col flex-center medium-container">
+    <button class="button button-large" onclick="loadModal('register-modal')">Login</button>
+    <button class="button button-large" onclick="loadModal('login-modal')">Register</button>
+</div>
+<div class="modal flex-center" id="login-modal">
+    <form class="form-container flex-col flex-center" method="POST" action="/register">
+        <button class="close-button" onclick="closeModal('login-modal')">X</button>
+        <svg width="100px" height="100px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto"
+            preserveAspectRatio="xMidYMid meet" fill="#000000">
+            <use href="#tent" />
+        </svg>
+        {{ render_fields(register_form, register_form_handler.fields, register_form_handler.break_point) }}
+    </form>
+</div>
+<div class="modal flex-center" id="register-modal">
+    <form class="form-container flex-col flex-center" method="POST" action="/login">
+        <button class="close-button" onclick="closeModal('register-modal')">X</button>
+        <svg width="100px" height="100px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+            xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto"
+            preserveAspectRatio="xMidYMid meet" fill="#000000">
+            <use href="#tent" />
+        </svg>
+        {{ render_fields(login_form, login_form_handler.fields, login_form_handler.break_point) }}
+    </form>
+</div>
+{%endblock %}
+{%block scripts %}
+<script>
+    function loadModal(modalId) {
+        document.getElementById(modalId).classList.add("active");
+    }
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove("active");
+    }
+
+</script>
+{%endblock%}

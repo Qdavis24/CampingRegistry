@@ -1,6 +1,6 @@
-from dotenv import load_dotenv
 import os
-
+from dotenv import load_dotenv
+load_dotenv(override=True)
 class Config:
     SECRET_KEY = os.getenv("SECRET_KEY")
     DEBUG=True
@@ -10,3 +10,4 @@ class Config:
     MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
     MYSQL_DATABASE = os.getenv("MYSQL_DATABASE")
     
+

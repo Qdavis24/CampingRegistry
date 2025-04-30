@@ -1,12 +1,15 @@
-CREATE DATABASE IF NOT EXISTS Camping;
+-- CREATE DATABASE IF NOT EXISTS Camping;
 
+DROP DATABASE IF EXISTS group1;
+CREATE DATABASE IF NOT EXISTS group1;
+USE group1;
 CREATE TABLE user(
 user_ID INT PRIMARY KEY AUTO_INCREMENT,
 email VARCHAR(50) NOT NULL UNIQUE,
 first_name VARCHAR(30) NOT NULL,
 last_name VARCHAR(30) NOT NULL,
 phone VARCHAR(10) NOT NULL,
-password VARCHAR(250) NOT NULL,
+password VARCHAR(255) NOT NULL,
 state CHAR(2) NOT NULL,
 city VARCHAR(30) NOT NULL,
 zipcode VARCHAR(5) NOT NULL,
@@ -15,7 +18,7 @@ street VARCHAR(50) NOT NULL
 
 CREATE TABLE area(
 area_ID INT PRIMARY KEY AUTO_INCREMENT,
-name VARCHAR(30) NOT NULL UNIQUE,
+name VARCHAR(60) NOT NULL UNIQUE,
 state CHAR(2) NOT NULL,
 county VARCHAR(30) NOT NULL,
 city VARCHAR(30) NOT NULL,
@@ -34,17 +37,17 @@ nightly_fee FLOAT NOT NULL,
 latitude DECIMAL(10,7) NOT NULL,
 longitude DECIMAL(10,7) NOT NULL,
 area_ID int NOT NULL,
-user_ID int NOT NULL,
+creator_ID int NOT NULL,
 CONSTRAINT site_fk_area FOREIGN KEY (area_ID) REFERENCES area(area_ID),
-CONSTRAINT site_fk_user FOREIGN KEY (user_ID) REFERENCES user(user_ID)
+CONSTRAINT site_fk_user FOREIGN KEY (creator_ID) REFERENCES user(user_ID)
 );
 
-CREATE TABLE IF NOT EXISTS saved_user_site(
+CREATE TABLE IF NOT EXISTS liked_user_site(
 user_ID INT NOT NULL,
 site_ID INT NOT NULL,
 PRIMARY KEY (user_ID, site_ID),
-CONSTRAINT saved_user_site_fk_user FOREIGN KEY (user_ID) REFERENCES user(user_ID),
-CONSTRAINT saved_user_site_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
+CONSTRAINT liked_user_site_fk_user FOREIGN KEY (user_ID) REFERENCES user(user_ID),
+CONSTRAINT liked_user_site_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
 );
 
 CREATE TABLE IF NOT EXISTS rule(
@@ -70,18 +73,18 @@ ammenities INT NOT NULL,
 cost INT NOT NULL,
 site_ID INT NOT NULL,
 CONSTRAINT rating_check_max CHECK(
-cleanliness BETWEEN 0 AND 10 AND
-accessibility BETWEEN 0 AND 10 AND
-quietness BETWEEN 0 AND 10 AND
-activities BETWEEN 0 AND 10 AND
-ammenities BETWEEN 0 AND 10 AND
-cost BETWEEN 0 AND 10),
+cleanliness BETWEEN 1 AND 10 AND
+accessibility BETWEEN 1 AND 10 AND
+quietness BETWEEN 1 AND 10 AND
+activities BETWEEN 1 AND 10 AND
+ammenities BETWEEN 1 AND 10 AND
+cost BETWEEN 1 AND 10),
 CONSTRAINT rating_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
 );
 
 CREATE TABLE photo(
 photo_ID INT PRIMARY KEY AUTO_INCREMENT,
-filepath VARCHAR(70) NOT NULL,
+filepath VARCHAR(50) NOT NULL,
 site_ID INT NOT NULL,
 CONSTRAINT photo_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
 );
@@ -91,7 +94,9 @@ comment_ID INT PRIMARY KEY AUTO_INCREMENT,
 comment VARCHAR(250) NOT NULL,
 timestamp DATE NOT NULL,
 site_ID INT NOT NULL,
-CONSTRAINT comment_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
+user_ID INT NOT NULL,
+CONSTRAINT comment_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID),
+CONSTRAINT comment_fk_user FOREIGN KEY (user_ID) REFERENCES user(user_ID)
 );
 
 

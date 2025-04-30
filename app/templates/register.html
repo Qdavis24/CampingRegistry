@@ -1,0 +1,30 @@
+{% from "macros/form_macros.html" import render_fields %}
+{% include 'svgs/svgs.html' %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+    <link rel="Stylesheet" type="text/css" href="../static/styles.css">
+</head>
+
+<body class="full-screen flex flex-center">
+    <form class="form-container flex-col flex-center" method="POST" action="/register">
+        <svg width="100px" height="100px" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" class="iconify iconify--noto"
+        preserveAspectRatio="xMidYMid meet" fill="#000000">
+            <use href="#tent"/>
+        </svg>
+          
+        {{ register_form.csrf_token }}
+        <div class="flex-row">
+            {{ render_fields(fields, break_point) }}
+        </div>
+        {{ register_form.submit(class="form-submit")}}    
+    </form>
+    
+</body>
+
+</html>

@@ -1,0 +1,144 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+
+:root {
+    --bg-light-grey: #AAADC4;
+    --bg-dark-grey: #8D909B;
+    --bg-light-green: #6A7062;
+    --bg-dark-green: #3E442B;
+    --bg-button-light-blue: #D6EEFF;
+    --bg-button-medium-blue: #A5D1FF; 
+
+    --accent-border-light: #B7BAD1;  /* Lighter version of light grey */
+    --accent-border-dark: #7A7E87;   /* Darker version of dark grey */
+    --accent-highlight: #9FA786;     /* Midtone between light and dark green */
+}
+h1 {
+    font-family: "Roboto", sans-serif;
+    font-weight: 400;
+    font-size: 100px;  
+    color: white;
+}
+.hero {
+    width: 100vw;
+    height: 50vh;
+    background-image: url("../static/hero_backdrop.jpg");
+    background-size: cover;
+    background-position-y: 50%;
+    background-color: rgba(0, 0, 0, .4);
+    background-blend-mode: overlay;
+    border-bottom: solid var(--accent-border-light) 3px;
+}
+
+.modal {
+    position: absolute;
+    z-index: 1;
+    width: 100vw;
+    height: 100vh;
+    -webkit-backdrop-filter: blur();
+    backdrop-filter: blur();
+    display: none;
+}
+.modal.active {
+    display: flex;
+}
+.grid {
+    margin-top: 50px;
+    width: 100vw;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8vw;
+}
+.grid-item {
+    background-color: var(--bg-light-grey);
+    border: 4px solid var(--accent-border-dark);
+    width: 100%;
+    height: 100%;
+}
+.form-container {
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 40px;
+    background: linear-gradient(to bottom right,
+            var(--bg-light-grey),
+            var(--bg-dark-grey));
+    border: 4px solid var(--accent-border-light);
+    border-radius: 2%;
+    max-height: 50vh;
+    
+}
+
+.form-field {
+    margin-top: 5px;
+    padding: 3px;
+    border: 2px solid var(--bg-dark-green);
+}
+
+.form-label {
+    font-family: "Roboto", sans-serif;
+    margin-top: 10px;
+}
+
+.close-button {
+    position: relative;
+    top: 0px;
+    right: 0px;
+    width: 3vw;
+    height: 3vh;
+    border-radius: 100%;
+    background-color: red;
+}
+
+.button:hover {
+    background-color: var(--bg-button-medium-blue);
+}
+.button {
+    margin-top: 40px;
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: var(--bg-button-light-blue);
+    border-radius: 5px;
+    font-family: "Roboto", sans-serif;
+    font-weight: 300;
+    font-size: larger;
+    transition: background-color .3s ease-in-out;
+}
+.button-large {
+    width: 30vw;
+    height: 10vh;
+}
+.button-medium {
+    width: 20vw;
+    height: 6vh;
+}
+.button-small {
+    width: 10vw;
+    height: 3vh;
+}
+
+.full-screen {
+    background: linear-gradient(to bottom right,
+            var(--bg-light-green),
+            var(--bg-dark-green));
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-row {
+    margin-top: 20px;
+    display: flex;
+    flex-direction: row;
+    gap: 50px;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+}
+
+.flex-center {
+    justify-content: center;
+    align-items: center;
+}
