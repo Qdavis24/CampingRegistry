@@ -1,22 +1,52 @@
+{% include 'svgs/svgs.html' %} 
 <!DOCTYPE html>
 <html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="Stylesheet" type="text/css" href="../static/styles.css">
-</head>
+    <link rel="Stylesheet" type="text/css" href="../static/styles.css" />
+  </head>
 
-<body class="full-screen flex-col">
-        <div class="flex flex-center hero">
-            <h1>{% block title %}{% endblock %}</h1>
-        </div>
-        {% block content %}
-        {% endblock %}
-    {% block scripts %}
-    
-    {% endblock %}
-</body>
+  <body>
+    <div class="flex flex-center hero">
+      {% if current_user.is_authenticated %}
+      <button class="button button-xsmall top-right flex flex-center">Logout</button>
+      {% else %}
+      <div class="flex-col top-right">
+        <button class="button fit flex flex-center" onclick="loadModal('login-modal')">Login</button>
+        <button class="button fit flex flex-center" onclick="loadModal('register-modal')">Register</button>
+      </div>
 
+      {%endif%}
+      <h1>{% block title %}{% endblock %}</h1>
+    </div>
+    {% block content %} {% endblock %}
+    <div class="modal flex flex-center blur-bg" id="login-modal">
+      <form class="form-container flex-col flex-center" method="POST" action="/register">
+        <svg width="60px" height="60px">
+            <use href="#tent" />
+          </svg>
+        <button class="button-close fit top-right" onclick="closeModal('login-modal')">X</button>
+        {{ render_fields(register_form, register_form_handler.fields, register_form_handler.break_point) }}
+      </form>
+    </div>
+    <div class="modal flex flex-center blur-bg" id="register-modal">
+      <form class="form-container flex-col flex-center" method="POST" action="/login">
+        <svg width="60px" height="60px">
+          <use href="#tent" />
+        </svg>
+        <button class="button-close fit top-right" onclick="closeModal('register-modal')">X</button>
+        {{ render_fields(login_form, login_form_handler.fields, login_form_handler.break_point) }}
+      </form>
+    </div>
+    <script>
+      function loadModal(modalId) {
+        document.getElementById(modalId).classList.add("active");
+      }
+      function closeModal(modalId) {
+        document.getElementById(modalId).classList.remove("active");
+      }
+    </script>
+  </body>
 </html>

@@ -17,12 +17,19 @@ def index(register_form=None, login_form=None):
     register_form_handler: FormHandler = FormHandler(register_form)
     login_form: LoginForm = login_form or LoginForm()
     login_form_handler: FormHandler = FormHandler(login_form)
+    with current_app.retrieve_db_connection() as (connection, cursor):
+        try:
+            cursor.execute("SELECT * FROM area;")
+            areas = cursor.fetchall()
+        except Exception as e:
+            logging.error(e)
     return render_template(
         "index.html",
         register_form=register_form,
         register_form_handler=register_form_handler,
         login_form=login_form,
-        login_form_handler=login_form_handler
+        login_form_handler=login_form_handler,
+        areas=areas
     )
 
 
@@ -90,7 +97,6 @@ def areas():
         try:
             cursor.execute("SELECT * FROM area;")
             areas = cursor.fetchall()
-            print(areas)
         except Exception as e:
             logging.error(e)
     return render_template("areas.html", areas=areas)
