@@ -200,17 +200,31 @@ p {
     justify-content: center;
     align-items: center;
 }
+.flex-7 {
+    flex: 7;
+}
+.flex-3 {
+    flex:3;
+}
+.container-full-width{
+    width: 100%;
+    height: fit;
+}
 .container-xlarge {
     width: 100%;
+    height: 100%;
 }
 .container-large {
     width: 75%;
+    height: 75%
 }
 .container-medium {
     width: 50%;
+    height: 50%
 }
 .container-small {
     width: 25%;
+    height: 25%
 }
 .text-container {
     height: fit;

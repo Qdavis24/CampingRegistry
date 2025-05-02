@@ -1,6 +1,7 @@
 from .forms import LoginForm, RegisterForm
-from .util_classes import FormHandler
-from flask_login import login_user, login_required, current_user
+from .util_classes import FormHandler, CampsitesManager, User
+from .exceptions import LimitError
+from flask_login import login_user, login_required, current_user, logout_user
 from flask import render_template, url_for, Blueprint, redirect, current_app, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 from mysql.connector import MySQLConnection
@@ -19,17 +20,26 @@ def index(register_form=None, login_form=None):
     login_form_handler: FormHandler = FormHandler(login_form)
     with current_app.retrieve_db_connection() as (connection, cursor):
         try:
-            cursor.execute("SELECT * FROM area;")
-            areas = cursor.fetchall()
+            cursor.execute("SELECT * FROM site;")
         except Exception as e:
             logging.error(e)
+        else:
+            sites = cursor.fetchall()
+    campsites_manager = CampsitesManager(current_app, sites)
+    try:
+        highest_rated = campsites_manager.get_highest_rated("overall", 5)
+    except Exception as e:
+        logging.error(f"her {e}")
+        highest_rated = None 
+    print(highest_rated)
+
     return render_template(
         "index.html",
         register_form=register_form,
         register_form_handler=register_form_handler,
         login_form=login_form,
         login_form_handler=login_form_handler,
-        areas=areas
+        highest_rated=highest_rated
     )
 
 
@@ -63,7 +73,7 @@ def register():
                 connection.commit()
                 login_user(cursor.lastrowid)
 
-        return redirect(url_for("app_blueprint.areas"))
+        return redirect(url_for("app_blueprint.index"))
     
     return redirect(url_for("app_blueprint.index", register_form=register_form))
 
@@ -77,27 +87,24 @@ def login():
             try:
                 cursor.execute("SELECT * FROM user WHERE email = %s;", (email,))
             except Exception as e:
-                logging.error(e)
+                logging.error(f"ERROR login database query : {e}")
             else:
                 user = cursor.fetchone()
+                print(user)
                 if not user:
                     flash("Email entered does not exists.")
                     return redirect(url_for("app_blueprint.index"))
                 if (check_password_hash(password=password, pwhash=user["password"])):
-                    login_user(user["user_ID"])
+                    login_user(User(**user))
                     
             
-        return redirect(url_for("app_blueprint.areas"))
+        return redirect(url_for("app_blueprint.index"))
     return redirect(url_for("app_blueprint.index", login_form=login_form))
 
 @login_required
-@app_blueprint.route("/areas", methods=["GET"])
-def areas():
-    with current_app.retrieve_db_connection() as (connection, cursor):
-        try:
-            cursor.execute("SELECT * FROM area;")
-            areas = cursor.fetchall()
-        except Exception as e:
-            logging.error(e)
-    return render_template("areas.html", areas=areas)
+@app_blueprint.route("/logout", methods=["GET"])
+def logout():
+    logout_user()
+    return redirect(url_for("app_blueprint.index"))
+    
     

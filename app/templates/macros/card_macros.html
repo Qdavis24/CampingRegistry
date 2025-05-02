@@ -1,0 +1,10 @@
+{% macro render_campsite(campsite) %}
+<div class="flex-col ">
+    <div class="flex-7">
+        <img href="{{campsite.filepath}}">
+    </div>
+    <div class="flex-3">
+        <p>{{campsite.area}}</p>
+    </div>
+</div>
+{% endmacro %}

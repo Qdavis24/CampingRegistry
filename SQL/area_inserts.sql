@@ -1,10 +1,4 @@
 
-
-DELETE FROM user
-WHERE email LIKE "Q%";
-
-SELECT * FROM area;
-
 INSERT INTO area (name, state, county, city, street_address, zipcode)
 VALUES
 ('Yosemite Valley Campground', 'CA', 'Mariposa', 'Yosemite National Park', '9000 Yosemite Valley Rd', '95389'),
@@ -22,3 +16,5 @@ VALUES
 ('Adirondack Lake Placid', 'NY', 'Essex', 'Lake Placid', '1932 Olympic Way', '12946'),
 ('Joshua Tree Hidden Valley', 'CA', 'San Bernardino', 'Twentynine Palms', '74485 National Park Dr', '92277'),
 ('Glacier National Park Many Glacier', 'MT', 'Glacier', 'Browning', 'Many Glacier Rd', '59417');
+
+SELECT * FROM area;

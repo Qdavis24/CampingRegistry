@@ -69,7 +69,7 @@ cleanliness INT NOT NULL,
 accessibility INT NOT NULL,
 quietness INT NOT NULL,
 activities INT NOT NULL,
-ammenities INT NOT NULL,
+amenities INT NOT NULL,
 cost INT NOT NULL,
 site_ID INT NOT NULL,
 CONSTRAINT rating_check_max CHECK(
@@ -77,7 +77,7 @@ cleanliness BETWEEN 1 AND 10 AND
 accessibility BETWEEN 1 AND 10 AND
 quietness BETWEEN 1 AND 10 AND
 activities BETWEEN 1 AND 10 AND
-ammenities BETWEEN 1 AND 10 AND
+amenities BETWEEN 1 AND 10 AND
 cost BETWEEN 1 AND 10),
 CONSTRAINT rating_fk_site FOREIGN KEY (site_ID) REFERENCES site(site_ID)
 );

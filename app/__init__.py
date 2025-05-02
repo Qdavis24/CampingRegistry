@@ -11,9 +11,16 @@ import logging
 
 logging.basicConfig(filename="./logs/last-run-log.txt", 
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    level=logging.DEBUG)
+                    level=logging.ERROR,
+                    filemode="w")
 
-            
+# Set Werkzeug's logger level explicitly
+werkzeug_logger = logging.getLogger('werkzeug')
+werkzeug_logger.setLevel(logging.ERROR)
+
+# Also set Flask's logger level
+flask_logger = logging.getLogger('flask')
+flask_logger.setLevel(logging.ERROR)
 
 def create_app():
     app = Flask(__name__)
@@ -65,13 +72,13 @@ def create_app():
         def load_user(user_id):
             with retrieve_db_connection() as (connection, cursor):
                 try:
-                    cursor.execute("SELECT *" \
-                    "FROM user" \
-                    "WHERE user_ID = %s", (user_id,))
+                    cursor.execute("SELECT * FROM user WHERE user_ID = %s", (user_id,))
                     user_dict = cursor.fetchone()
                     user = User(**user_dict) if user_dict else None
+                    print(user)
                 except Exception as e:
-                    logging.error(e)
+                    print("here")
+                    logging.error(f"failure to load user {e}")
             
             return user
             

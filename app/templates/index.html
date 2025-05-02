@@ -1,5 +1,8 @@
-{% from "macros/form_macros.html" import render_fields %} {% extends "./partials/base.html" %} {% block title %}Camping Registry{%endblock%} {% block content %}
-<div class="flex flex-center container-xlarge">
+{% from "macros/form_macros.html" import render_fields %} 
+{% extends "./partials/base.html" %} 
+{% block title %}Camping Registry{%endblock%} 
+{% block content %}
+<div class="flex-col flex-center container-full-width">
     {% if not current_user.is_authenticated %}
     <div class="flex-col flex-center container-large" style="margin-top: 3rem;">
         <h2>Find Your Perfect Outdoor Getaway</h1>
@@ -30,16 +33,22 @@
 
     </div>
     {%endif%}
-    
-</div>
-<div class="flex-col flex-center container-xlarge" style="margin-top: 3rem;">
-    <h2>Camping Areas</h1>
-    <div class="grid">
-        {% for area in areas %}
-            <div class="flex flex-center grid-item">
-                <h2>{{area["name"]}}</h2>
+    <div class="flex-col flex-center container-large" style="margin-top: 3rem;">
+        <h2>Popular Campsites</h1>
+            <div class="flex-row flex-center">
+                <div class="flex flex-center">
+            
+                </div>
+                <div class="flex-col">
+                    <div class="flex flex-center">
+            
+                    </div>
+                    <div class="flex flex-center">
+                        
+                    </div>
+                </div>
+            
             </div>
-        {% endfor %}
-        </div>
     </div>
+</div>
 {%endblock%}
