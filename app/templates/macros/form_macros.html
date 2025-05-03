@@ -1,7 +1,7 @@
 
 {% macro render_fields(form, fields, break_point) %} {{ form.csrf_token }}
-<div class="flex-row">
-  <div class="flex-col flex-center">{% for field in fields[:break_point] %} {{ field(class="form-field", placeholder=field.label.text) }} {% endfor %}</div>
-  <div class="flex-col flex-center">{% for field in fields[break_point:] %} {{ field(class="form-field", placeholder=field.label.text) }} {% endfor %}</div>
+<div class="flex-row flex-gap-lg">
+  <div class="flex-col flex-gap-lg flex-center">{% for field in fields[:break_point] %} {{ field(class="form-field", placeholder=field.label.text) }} {% endfor %}</div>
+  <div class="flex-col flex-gap-lg flex-center">{% for field in fields[break_point:] %} {{ field(class="form-field", placeholder=field.label.text) }} {% endfor %}</div>
 </div>
 {{ form.submit(class="button fit", style="margin-top: 10px;")}} {% endmacro %}

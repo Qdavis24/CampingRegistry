@@ -1,5 +1,5 @@
 from .forms import LoginForm, RegisterForm
-from .util_classes import FormHandler, CampsitesManager, User
+from .util_classes import FormHandler, CampsitesManager, User, Campsite
 from .exceptions import LimitError
 from flask_login import login_user, login_required, current_user, logout_user
 from flask import render_template, url_for, Blueprint, redirect, current_app, flash
@@ -11,6 +11,8 @@ import logging
 
 app_blueprint = Blueprint("app_blueprint", "app_blueprint")
 
+campsite_manager = CampsitesManager()
+
 
 @app_blueprint.route("/", methods=["GET"])
 def index(register_form=None, login_form=None):
@@ -18,28 +20,27 @@ def index(register_form=None, login_form=None):
     register_form_handler: FormHandler = FormHandler(register_form)
     login_form: LoginForm = login_form or LoginForm()
     login_form_handler: FormHandler = FormHandler(login_form)
+    
+    campsites = []
+    highest_rated_sites_by_overall = campsite_manager.fetch_by_overall_rating(current_app, limit=5)
+
     with current_app.retrieve_db_connection() as (connection, cursor):
         try:
-            cursor.execute("SELECT * FROM site;")
+            cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_sites_by_overall)}")
         except Exception as e:
-            logging.error(e)
+            logging.error(f"Failure to load sites from highest rated sites: {e}")
         else:
-            sites = cursor.fetchall()
-    campsites_manager = CampsitesManager(current_app, sites)
-    try:
-        highest_rated = campsites_manager.get_highest_rated("overall", 5)
-    except Exception as e:
-        logging.error(f"her {e}")
-        highest_rated = None 
-    print(highest_rated)
-
+            for site in cursor.fetchall():
+                new_campsite = Campsite(current_app, **site)
+                campsites.append(new_campsite)
+    print(campsites[0].area)
     return render_template(
         "index.html",
         register_form=register_form,
         register_form_handler=register_form_handler,
         login_form=login_form,
         login_form_handler=login_form_handler,
-        highest_rated=highest_rated
+        campsites=campsites,
     )
 
 

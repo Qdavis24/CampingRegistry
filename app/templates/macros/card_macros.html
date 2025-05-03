@@ -1,10 +1,22 @@
+{% include 'svgs/svgs.html' %}
 {% macro render_campsite(campsite) %}
-<div class="flex-col ">
-    <div class="flex-7">
-        <img href="{{campsite.filepath}}">
+<div class="flex-col width-100 height-100 card">
+    <div class="flex-8" style="background-image: url('{{campsite.filepaths[0]}}'); background-position: center;">
     </div>
-    <div class="flex-3">
-        <p>{{campsite.area}}</p>
+    <div class="flex-2 background-primary">
+        <p>{{campsite.area[0]['name']}}</p>
+        <div class="flex-row flex-gap-sm">
+            {% for star in range(campsite.overall_score[0]["avg"] | int) %}
+                <svg width="25px" height="25px">
+                    <use href="#star-filled" />
+                </svg>
+            {% endfor %}
+            {% for empty_star in range(10 - campsite.overall_score[0]["avg"] | int) %}
+            <svg width="25px" height="25px">
+                <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+        </div>
     </div>
 </div>
 {% endmacro %}

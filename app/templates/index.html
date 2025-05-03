@@ -1,31 +1,59 @@
 {% from "macros/form_macros.html" import render_fields %} 
+{%from "macros/card_macros.html" import render_campsite %}
 {% extends "./partials/base.html" %} 
 {% block title %}Camping Registry{%endblock%} 
 {% block content %}
-<div class="flex-col flex-center container-full-width">
+<div class="flex-col flex-center width-full-screen">
+    <div class="flex-col flex-center width-full-screen background-secondary padding-lg">
+            <div class="flex-row flex-gap-sm r-container-large">
+                <div class="flex flex-4">
+                    {{ render_campsite(campsites[0]) }}
+                </div>
+                <div class="flex-col flex-gap-md flex-6">
+                    <div class="flex-row flex-gap-sm flex-5">
+                        <div class="flex width-100 height-100">
+                            {{ render_campsite(campsites[1]) }}
+                        </div>
+                        <div class="flex width-100 height-100">
+                            {{ render_campsite(campsites[2]) }}
+                        </div>
+                    </div>
+                    <div class="flex-row flex-gap-sm flex-5">
+                        <div class="flex width-100 height-100">
+                            {{ render_campsite(campsites[3]) }}
+                        </div>
+                        <div class="flex width-100 height-100">
+                            {{ render_campsite(campsites[4]) }}
+                        </div>
+                    </div>
+                    
+                </div>
+            
+            </div>
+    </div>
     {% if not current_user.is_authenticated %}
-    <div class="flex-col flex-center container-large" style="margin-top: 3rem;">
+    <div class="flex-col flex-center width-full-screen" style="margin-top: 3rem;">
         <h2>Find Your Perfect Outdoor Getaway</h1>
-            <div class="flex-row flex-center">
+            <div class="flex-row flex-gap-xxl flex-center">
                 <div class="text-container">
-                    <p>
+                    <p class="interactive-text">
                         Welcome to CampSpot, your ultimate resource for discovering and sharing exceptional camping locations. Our community-driven platform connects outdoor enthusiasts with the best sites across the country. Find your next adventure with our easy-to-use interface that puts nature's best spots at your fingertips.
                     </p>
-                    <p>
+                    <p class="interactive-text">
                         Explore our comprehensive database of camping areas and discover sites with the amenities that matter most to you. Whether you're searching for locations with electrical hookups, clean restrooms, shower facilities, or budget-friendly options, our detailed listings have everything you need to plan the perfect outdoor getaway.
                     </p>
-                    <p>
+                    <p class="interactive-text">
                         Every site in our registry includes essential information like nightly fees, geographic coordinates, and user ratings across multiple categories including cleanliness, accessibility, quietness, available activities, amenities, and cost. Our rating system helps you find exactly what you're looking for based on real camper experiences.
                     </p>
                 </div>
                 <div class="text-container">
-                    <p>
+                    <p class="interactive-text">
                         Browse through user-submitted photos to get a real preview of each location. Read comments and reviews from fellow campers to make informed decisions about your next adventure. Our community members provide honest feedback to help you avoid surprises and find hidden gems across the country.
                     </p>
-                    <p>
+                    <p class="interactive-text">
                         Found a site you love? Save it to your personal collection for easy access later. Know an amazing spot that isn't listed yet? Share it with our community by creating a detailed listing. CampSpot makes it simple to contribute your discoveries and maintain a personalized list of favorite destinations.
                     </p>
-                    <p>
+                    <p class="interactive-text">
                         Start your journey by exploring areas near you or in your desired destination. Whether you're planning a weekend getaway or an extended outdoor expedition, CampSpot helps you find the perfect place to connect with nature. Join thousands of outdoor enthusiasts who are already discovering, saving, and sharing remarkable camping sites.
                     </p>
                 </div>
@@ -33,22 +61,6 @@
 
     </div>
     {%endif%}
-    <div class="flex-col flex-center container-large" style="margin-top: 3rem;">
-        <h2>Popular Campsites</h1>
-            <div class="flex-row flex-center">
-                <div class="flex flex-center">
-            
-                </div>
-                <div class="flex-col">
-                    <div class="flex flex-center">
-            
-                    </div>
-                    <div class="flex flex-center">
-                        
-                    </div>
-                </div>
-            
-            </div>
-    </div>
+    
 </div>
 {%endblock%}

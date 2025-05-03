@@ -1,242 +1,311 @@
-@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap");
 
 :root {
-    --bg-light-grey: #AAADC4;
-    --bg-dark-grey: #8D909B;
-    --bg-light-green: #6A7062;
-    --bg-dark-green: #3E442B;
-    --bg-button-light-blue: #D6EEFF;
-    --bg-button-medium-blue: #A5D1FF; 
+  --bg-light-grey: #aaadc4;
+  --bg-dark-grey: #8d909b;
+  --bg-light-green: #6a7062;
+  --bg-dark-green: #3e442b;
+  --bg-button-light-blue: #d6eeff;
+  --bg-button-medium-blue: #a5d1ff;
 
-    --accent-border-light: #B7BAD1;  /* Lighter version of light grey */
-    --accent-border-dark: #7A7E87;   /* Darker version of dark grey */
-    --accent-highlight: #9FA786;     /* Midtone between light and dark green */
+  --accent-border-light: #b7bad1; /* Lighter version of light grey */
+  --accent-border-dark: #7a7e87; /* Darker version of dark grey */
+  --accent-highlight: #9fa786; /* Midtone between light and dark green */
 }
 body {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    overflow-x: hidden;
-    background: linear-gradient(to bottom right,
-            var(--bg-light-green),
-            var(--bg-dark-green));
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  overflow-x: hidden;
+  background: linear-gradient(to bottom right, var(--bg-light-green), var(--bg-dark-green));
 }
 h1 {
-    font-family: "Roboto", sans-serif;
-    font-weight: 400;
-    font-size: 100px;  
-    color: white;
+  font-family: "Roboto", sans-serif;
+  font-weight: 400;
+  font-size: 100px;
+  color: white;
 }
 h2 {
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    font-size: 40px;
-    color: white;
-    margin-top: 25px;
-    margin-bottom: 15px;
-    letter-spacing: 1px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  font-size: 40px;
+  color: white;
+  letter-spacing: 1px;
+  margin: 0;
 }
 
 p {
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    font-size: 18px;
-    line-height: 1.6;
-    color: rgba(255, 255, 255, 0.9);
-    margin-bottom: 20px;
-    max-width: 800px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 20px;
+  max-width: 800px;
+}
+.container-responsive-image {
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    flex: 7;
+}
+.responsive-image {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
 }
 .hero {
-    width: 100vw;
-    height: 25vh;
-    position:relative;
-    background-image: url("../static/hero_backdrop.jpg");
-    background-size: cover;
-    background-position-y: 62%;
-    background-color: rgba(0, 0, 0, .4);
-    background-blend-mode: overlay;
-    border-bottom: solid var(--accent-border-light) 3px;
+  width: 100vw;
+  height: 25vh;
+  position: relative;
+  background-image: url("../static/hero_backdrop.jpg");
+  background-size: cover;
+  background-position-y: 62%;
+  background-color: rgba(0, 0, 0, 0.4);
+  background-blend-mode: overlay;
+  border-bottom: solid var(--accent-border-light) 3px;
 }
 .blur-bg {
-    -webkit-backdrop-filter: blur(4px);
-    backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
 }
 
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    width: 100vw;
-    height: 100vh;
-    opacity: 0;
-    transition: opacity .5s ease;
-    pointer-events: none;
-    
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  pointer-events: none;
 }
 .modal.active {
-    opacity: 1;
-    pointer-events: all;
-    
+  opacity: 1;
+  pointer-events: all;
 }
 .form-container {
-    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    padding: 30px;
-    background: linear-gradient(to bottom right,
-            var(--bg-light-grey),
-            var(--bg-dark-grey));
-    border: 4px solid var(--accent-border-light);
-    border-radius: 2%;
-    position: relative;
-    
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  background: linear-gradient(to bottom right, var(--bg-light-grey), var(--bg-dark-grey));
+  border: 4px solid var(--accent-border-light);
+  border-radius: 2%;
+  position: relative;
 }
 
 .form-field {
-    margin-top: 5px;
-    padding: 3px;
-    border: 2px solid var(--bg-dark-green);
+  margin-top: 5px;
+  padding: 3px;
+  border: 2px solid var(--bg-dark-green);
 }
 
 .form-label {
-    font-family: "Roboto", sans-serif;
-    margin-top: 10px;
+  font-family: "Roboto", sans-serif;
+  margin-top: 10px;
 }
 .grid {
-    margin-top: 50px;
-    width: 75vw;
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8vw;
+  margin-top: 50px;
+  width: 75vw;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8vw;
 }
 .grid-item {
-    background-color: var(--bg-light-grey);
-    border: 4px solid var(--accent-border-dark);
-    width: 100%;
-    height: 100%;
+  background-color: var(--bg-light-grey);
+  border: 4px solid var(--accent-border-dark);
+  width: 100%;
+  height: 100%;
 }
-
 
 .top-right {
-    position: absolute;
-    top: 10px;
-    right: 20px;
+  position: absolute;
+  top: 10px;
+  right: 20px;
 }
 .top-center {
-    position: absolute;
-    top:5px;
+  position: absolute;
+  top: 5px;
 }
 .button:hover {
-    background-color: var(--bg-button-medium-blue);
+  background-color: var(--bg-button-medium-blue);
 }
 .button {
-    padding-top: 5px;
-    padding-bottom: 5px;
-    padding-left: 20px;
-    padding-right: 20px;
-    background-color: var(--bg-button-light-blue);
-    border-radius: 5px;
-    font-family: "Roboto", sans-serif;
-    font-weight: 300;
-    font-size: larger;
-    transition: background-color .2s ease-in-out;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  padding-left: 20px;
+  padding-right: 20px;
+  background-color: var(--bg-button-light-blue);
+  border-radius: 5px;
+  font-family: "Roboto", sans-serif;
+  font-weight: 300;
+  font-size: larger;
+  transition: background-color 0.2s ease-in-out;
 }
 .button-close {
-    padding: 4px;
-    height:fit;
-    width: auto;
-    border-radius: 50%;
-    background-color: red;
-    transition: background-color .2s ease-in-out;
+  padding: 4px;
+  height: fit;
+  width: auto;
+  border-radius: 50%;
+  background-color: red;
+  transition: background-color 0.2s ease-in-out;
 }
 .button-close:hover {
-    background-color: lightcoral;
+  background-color: lightcoral;
 }
 .button-large {
-    width: 30%;
-    height: 10%;
+  width: 30%;
+  height: 10%;
 }
 .button-medium {
-    width: 20%;
-    height: 6%;
+  width: 20%;
+  height: 6%;
 }
 .button-small {
-    width: 10%;
-    height: 3%;
+  width: 10%;
+  height: 3%;
 }
 .button-xsmall {
-    width: 4%;
+  width: 4%;
 }
 .fit {
-    width: fit;
-    height: fit;
+  width: fit;
+  height: fit;
 }
 
-.background {
-    background: linear-gradient(to bottom right,
-            var(--bg-light-green),
-            var(--bg-dark-green));
+.background-primary {
+  background: linear-gradient(to bottom right, var(--bg-light-green), var(--bg-dark-green));
+}
+.background-secondary {
+    background: linear-gradient(to bottom right, var(--bg-light-grey), var(--bg-dark-grey));
 }
 
 .flex {
-    display: flex;
+  display: flex;
 }
 
 .flex-row {
-    margin-top: 20px;
-    display: flex;
-    flex-direction: row;
-    gap: 60px;
+  display: flex;
+  flex-direction: row;
 }
 
 .flex-col {
-    display: flex;
-    flex-direction: column;
-    gap: .5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .flex-center {
-    justify-content: center;
-    align-items: center;
+  justify-content: center;
+  align-items: center;
+}
+.flex-gap-xxl {
+    gap:5vh;
+}
+.flex-gap-xl {
+    gap:3vh;
+}
+.flex-gap-lg {
+    gap: 2vh;
+}
+.flex-gap-md {
+    gap: 1vh;
+}
+.flex-gap-sm {
+    gap: .5vh;
+}
+.flex-5 {
+ flex:5 0 0%;
+}
+.flex-6 {
+    flex:6 0 0%;
 }
 .flex-7 {
-    flex: 7;
+  flex: 7 0 0%;
+}
+.flex-8 {
+    flex: 8 0 0%;
 }
 .flex-3 {
-    flex:3;
+  flex: 3 0 0%;
 }
-.container-full-width{
-    width: 100%;
-    height: fit;
+.flex-4 {
+    flex: 4 0 0%;
 }
-.container-xlarge {
-    width: 100%;
-    height: 100%;
+.width-full-screen {
+    width: 100vw;
+    height: fit-content;
 }
-.container-large {
-    width: 75%;
-    height: 75%
+.width-100 {
+    width:100%
 }
-.container-medium {
-    width: 50%;
-    height: 50%
+.height-100{
+    height: 100%
 }
-.container-small {
-    width: 25%;
-    height: 25%
+.r-container-xlarge {
+    width:100vw;
+    height: 50vh;
+}
+.r-container-large {
+    width:60vw;
+    height:50vh;
+}
+.r-container-medium {
+    width:50vw;
+    height:40vh;
+}
+.r-container-small {
+    width:25vw;
+    height:12vh;
+}
+.r-container-xsmall {
+    width:10vw;
+    height:5vh;
+}
+.s-container-xlarge {
+  width: 100vw;
+  height: 100vh;
+}
+.s-container-large {
+  width: 75vw;
+  height: 75vh;
+}
+.s-container-medium {
+  width: 50vw;
+  height: 50vh;
+}
+.s-container-small {
+  width: 25vw;
+  height: 25vh;
+}
+.s-container-xsmall {
+  width: 10vw;
+  height: 10vh;
 }
 .text-container {
-    height: fit;
+    width: 40vw;
+    height: fit-content;
 }
-.text-container p {
-    padding: 4px;
-    transition: transform .5s ease, text-shadow 1s ease;
-    text-shadow: h-shadow v-shadow blur-radius color;
+.interactive-text {
+  padding: 4px;
+  transition: transform 0.5s ease, text-shadow 1s ease;
+  text-shadow: h-shadow v-shadow blur-radius color;
 }
-.text-container p:hover {
-    background-color: rgba(0, 0, 0, .3);
-    border-radius: 3px;
-    transform: scale(1.1);
-    text-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
+.interactive-text:hover {
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 3px;
+  transform: scale(1.1);
+  text-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
+}
+.card {
+    border: 3px solid var(--accent-border-dark);
+    border-radius: 5px;
+}
+.padding-lg {
+    padding: 2vw;
 }

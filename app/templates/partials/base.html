@@ -13,7 +13,7 @@
       {% if current_user.is_authenticated %}
       <a href="/logout"><button class="button button-xsmall top-right flex flex-center">Logout</button></a>
       {% else %}
-      <div class="flex-col top-right">
+      <div class="flex-col flex-gap-sm top-right">
         <button class="button fit flex flex-center" onclick="loadModal('login-modal')">Login</button>
         <button class="button fit flex flex-center" onclick="loadModal('register-modal')">Register</button>
       </div>
@@ -22,7 +22,7 @@
     </div>
     {% block content %} {% endblock %}
     <div class="modal flex flex-center blur-bg" id="register-modal">
-      <form class="form-container flex-col flex-center" method="POST" action="/register">
+      <form class="form-container flex-col flex-gap-md flex-center" method="POST" action="/register">
         <svg width="60px" height="60px">
             <use href="#tent" />
           </svg>
@@ -31,7 +31,7 @@
       </form>
     </div>
     <div class="modal flex flex-center blur-bg" id="login-modal">
-      <form class="form-container flex-col flex-center" method="POST" action="/login">
+      <form class="form-container flex-col flex-gap-md flex-center" method="POST" action="/login">
         <svg width="60px" height="60px">
           <use href="#tent" />
         </svg>
