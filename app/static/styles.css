@@ -22,7 +22,7 @@ body {
 h1 {
   font-family: "Roboto", sans-serif;
   font-weight: 400;
-  font-size: 100px;
+  font-size: 90px;
   color: white;
 }
 h2 {
@@ -44,30 +44,42 @@ p {
   max-width: 800px;
 }
 .container-responsive-image {
-    height: 100%;
-    position: relative;
-    overflow: hidden;
-    flex: 7;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  flex: 7;
 }
 .responsive-image {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    object-position: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 .hero {
-  width: 100vw;
-  height: 25vh;
-  position: relative;
+  width: 100%;
+  height: 25vh; /* Initial height */
+  position:fixed; /* Change from relative to sticky */
+  top: 0; /* Stick to top of viewport */
+  z-index: 100; /* Ensure it stays above other content */
   background-image: url("../static/hero_backdrop.jpg");
   background-size: cover;
   background-position-y: 62%;
   background-color: rgba(0, 0, 0, 0.4);
   background-blend-mode: overlay;
   border-bottom: solid var(--accent-border-light) 3px;
+}
+
+/* Add a class for the scrolled state */
+.hero-scrolled {
+  font-size: small;
+  height: 10vh; /* Smaller height when scrolled */
+}
+.hero-container {
+    width: 100%;
+    height: 25vh; 
 }
 .blur-bg {
   -webkit-backdrop-filter: blur(4px);
@@ -183,7 +195,7 @@ p {
   background: linear-gradient(to bottom right, var(--bg-light-green), var(--bg-dark-green));
 }
 .background-secondary {
-    background: linear-gradient(to bottom right, var(--bg-light-grey), var(--bg-dark-grey));
+  background: linear-gradient(to bottom, var(--bg-light-grey), var(--bg-light-green));
 }
 
 .flex {
@@ -205,67 +217,68 @@ p {
   align-items: center;
 }
 .flex-gap-xxl {
-    gap:5vh;
+  gap: 5vh;
 }
 .flex-gap-xl {
-    gap:3vh;
+  gap: 3vh;
 }
 .flex-gap-lg {
-    gap: 2vh;
+  gap: 2vh;
 }
 .flex-gap-md {
-    gap: 1vh;
+  gap: 1vh;
 }
 .flex-gap-sm {
-    gap: .5vh;
+  gap: 0.5vh;
 }
 .flex-5 {
- flex:5 0 0%;
+  flex: 5 0 0%;
 }
 .flex-6 {
-    flex:6 0 0%;
+  flex: 6 0 0%;
 }
 .flex-7 {
   flex: 7 0 0%;
 }
 .flex-8 {
-    flex: 8 0 0%;
+  flex: 8 0 0%;
 }
 .flex-3 {
   flex: 3 0 0%;
 }
 .flex-4 {
-    flex: 4 0 0%;
+  flex: 4 0 0%;
 }
 .width-full-screen {
-    width: 100vw;
-    height: fit-content;
+  width: 100vw;
+  height: fit-content;
+  border-bottom: 2px solid var(--accent-border-light);
 }
 .width-100 {
-    width:100%
+  width: 100%;
 }
-.height-100{
-    height: 100%
+.height-100 {
+  height: 100%;
 }
 .r-container-xlarge {
-    width:100vw;
-    height: 50vh;
+  width: 100vw;
+  height: 50vh;
 }
 .r-container-large {
-    width:60vw;
-    height:50vh;
+  width: 60vw;
+  height: 50vh;
 }
 .r-container-medium {
-    width:50vw;
-    height:40vh;
+  width: 50vw;
+  height: 40vh;
 }
 .r-container-small {
-    width:25vw;
-    height:12vh;
+  width: 25vw;
+  height: 12vh;
 }
 .r-container-xsmall {
-    width:10vw;
-    height:5vh;
+  width: 10vw;
+  height: 5vh;
 }
 .s-container-xlarge {
   width: 100vw;
@@ -288,24 +301,27 @@ p {
   height: 10vh;
 }
 .text-container {
-    width: 40vw;
-    height: fit-content;
+  width: 40vw;
+  height: fit-content;
 }
 .interactive-text {
   padding: 4px;
-  transition: transform 0.5s ease, text-shadow 1s ease;
-  text-shadow: h-shadow v-shadow blur-radius color;
+  transition: font-size 0.5s ease-in;
 }
 .interactive-text:hover {
-  background-color: rgba(0, 0, 0, 0.3);
+  background-color: rgba(0, 0, 0, 0.05);
   border-radius: 3px;
-  transform: scale(1.1);
-  text-shadow: 4px 4px 5px rgba(0, 0, 0, 0.5);
+  font-size: xlarge;
 }
 .card {
-    border: 3px solid var(--accent-border-dark);
-    border-radius: 5px;
+  border: 3px solid var(--accent-border-dark);
+  border-radius: 5px;
+  transition: box-shadow, scale 0.5s ease-in-out;
+}
+.card:hover {
+  box-shadow: 2px 2px 4px black;
+  scale: 102%;
 }
 .padding-lg {
-    padding: 2vw;
+  padding: 2vw;
 }

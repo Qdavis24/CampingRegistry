@@ -1,4 +1,4 @@
-{% include 'svgs/svgs.html' %} 
+{% include 'svgs/svgs.html' %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,6 +9,7 @@
   </head>
 
   <body>
+    <div class="hero-container"></div>
     <div class="flex flex-center hero">
       {% if current_user.is_authenticated %}
       <a href="/logout"><button class="button button-xsmall top-right flex flex-center">Logout</button></a>
@@ -20,12 +21,13 @@
       {%endif%}
       <h1>{% block title %}{% endblock %}</h1>
     </div>
+
     {% block content %} {% endblock %}
     <div class="modal flex flex-center blur-bg" id="register-modal">
       <form class="form-container flex-col flex-gap-md flex-center" method="POST" action="/register">
         <svg width="60px" height="60px">
-            <use href="#tent" />
-          </svg>
+          <use href="#tent" />
+        </svg>
         <button class="button-close fit top-right" onclick="closeModal('register-modal')">X</button>
         {{ render_fields(register_form, register_form_handler.fields, register_form_handler.break_point) }}
       </form>
@@ -40,6 +42,24 @@
       </form>
     </div>
     <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const hero = document.querySelector(".hero");
+        const initialHeight = 25; // Initial height in vh
+        const minHeight = 10; // Minimum height in vh
+
+        window.addEventListener("scroll", function () {
+          // Convert scroll pixels to vh units (approx)
+          const viewportHeight = window.innerHeight;
+          const scrollVh = (window.scrollY / viewportHeight) * 100;
+
+          // Decrease height by exact scroll amount in vh
+          const newHeight = Math.max(initialHeight - scrollVh, minHeight);
+
+          // Apply new height
+          hero.style.height = newHeight + "vh";
+
+        });
+      });
       function loadModal(modalId) {
         document.getElementById(modalId).classList.add("active");
       }
