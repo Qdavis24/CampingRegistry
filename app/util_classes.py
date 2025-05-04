@@ -40,7 +40,28 @@ class CampsitesManager:
             processed_campsites.append(new_campsite)
         return processed_campsites
         
+    def fetch_by_areas(self, app, search_type, search_term, offset, limit):
+        if limit < 1:
+            raise LimitError()
+        if offset < 1:
+            raise LimitError()
 
+        site_ids = None
+
+        with app.retrieve_db_connection() as (connection, cursor):
+            try:
+                cursor.execute("""SELECT s.*
+                                  FROM site as s
+                                  JOIN area as a 
+                                  ON s.area_ID = a.area_ID
+                                  WHERE a.%s LIKE %s
+                                  LIMIT %s OFFSET %s""", (search_type, search_term, limit, offset))
+            except Exception as e:
+                logging.error(f"failure to retrieve sites from location type and name : {e}")
+            else:
+                site_ids = [row["site_ID"] for row in cursor.fetchall()]
+
+        return site_ids
     def fetch_by_area(self, app, area_id, offset, limit):
         """ Fetches the campsite IDs for a given area ID.
         Args:

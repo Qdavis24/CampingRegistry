@@ -68,9 +68,10 @@
 
     </div>
     {%else%}
-    <div class="flex-row width-full-screen">
+    <div class="flex-col flex-gap-lg">
+        <div class="flex-row width-full-screen">
         <div class="form-container height-100 padding-md flex-col flex-gap-md flex-5">
-            <h2>Find Your Perfect Campsite</h2>
+            <h2>Find Your Perfect Campsite.</h2>
 
             <div class="flex-row flex-gap-md">
                 <select id="search-type" class="form-field flex-3">
@@ -82,8 +83,11 @@
 
                 <input type="text" id="search-term" placeholder="Enter location..." class="form-field flex-7">
 
-                <button type="submit" class="button fit">Search</button>
+                <button type="submit" class="button fit" onclick="searchCampsites()">Search</button>
             </div>
+        </div>
+        <div class="flex-col flex-gap-lg" id="search-sites-container">
+            
         </div>
         <div class="background-secondary flex-5 flex-col flex-center flex-gap-lg">
             <div class="form-container flex flex-center background-primary flex-1 width-100">
@@ -100,6 +104,89 @@
         </div>
 
     </div>
+    </div>
+    
     {%endif%}
 </div>
+<script>
+    const searchTypeEl = document.getElementById("search-type");
+    const searchTermEl = document.getElementById("search-term");
+    const searchSitesContainer = document.getElementById("search-sites-container");
+
+    async function searchCampsites()
+    {
+        if (searchSitesContainer === null) return;
+        const searchTypeVal = searchTypeEl ? searchTypeEl.value : null;
+        const searchTermVal = searchTermEl ? searchTermEl.value : null;
+
+        const response = await fetch(`/search-by-location?search-type=${searchTypeVal}&search-term=${searchTermVal}`,
+            {
+                method: "GET",
+            }
+        );
+
+        const data = await response.json();
+
+        if (!data || data["count"] < 1)
+        {
+            searchSitesContainer.innerHTML = `<h2>No campsites found under location ${searchTypeVal} ${searchTermVal}</h2>`
+            return;
+        }
+
+        const campsites = data["campsites"];
+
+        const grid = document.createElement('div');
+        grid.style = "grid flex-gap-lg";
+        campsites.forEach(function(campsite) {
+            let newCard = buildCampsiteCard(campsite);
+            grid.appendChild(newCard);
+        });
+
+
+        
+
+
+    }
+    function buildCampsiteCard(campsite)
+    {
+        const newCard = document.createElement("div");
+        newCard.className = "flex-col width-100 height-100 card";
+
+        const avgStarRatingEl = buildCampsiteStars(Math.round(campsite['overall_score']));
+    
+        newCard.innerHTML = `
+        <div class="flex-8" style="background-image: url('${campsite["filepaths"][0]}'); background-position: center;">
+        </div>
+        <div class="flex-2 background-primary">
+            <p>${campsite["area"]["name"]}</p>
+            <div class="flex-row flex-gap-sm">
+                ${avgStarRatingEl.outerHTML}
+            </div>
+        </div>
+        `;
+        return newCard;
+    }
+    function buildCampsiteStars(rating)
+    {
+        const filledStarSvgHTML = `<svg width="25px" height="25px">
+                        <use href="#star-filled" />
+                    </svg>`;
+        const emptyStarSvgHTML = `
+        <svg width="25px" height="25px">
+                        <use href="#star-empty" />
+                    </svg>` ;
+
+        const ratingContainer = document.createElement("div");
+        ratingContainer.className = "flex-row flex-gap-sm";
+        for (let i = 0; i < rating; i++)
+        {
+            ratingContainer.innerHTML += filledStarSvgHTML;
+        }
+        for (let i = 0; i < 10-rating; i++)
+        {
+            ratingContainer.innerHTML += emptyStarSvgHTML;
+        }
+        return ratingContainer;
+    }
+</script>
 {%endblock%}

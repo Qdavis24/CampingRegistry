@@ -1,0 +1,2 @@
+2025-05-04 13:13:24,114 - root - ERROR - type object 'CampsitesManager' has no attribute 'process_raw_campsites'
+2025-05-04 13:13:43,239 - root - ERROR - type object 'CampsitesManager' has no attribute 'process_raw_campsites'

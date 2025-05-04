@@ -2,7 +2,7 @@ from .forms import LoginForm, RegisterForm, CreatSiteForm
 from .util_classes import FormHandler, CampsitesManager, User, Campsite
 from .exceptions import LimitError
 from flask_login import login_user, login_required, current_user, logout_user
-from flask import render_template, url_for, Blueprint, redirect, current_app, flash, session
+from flask import render_template, url_for, Blueprint, redirect, current_app, flash, session, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
 from mysql.connector import MySQLConnection
 import logging
@@ -78,9 +78,6 @@ def index(curr_modal=None):
             else:
                 highest_rated_campsites_by_overall_raw = cursor.fetchall()
 
-
-        print(highest_rated_campsites_by_overall_raw)
-        print(user_created_campsites_raw)
         if highest_rated_campsites_by_overall_raw:
             highest_rated_campsites_by_overall = CampsitesManager.process_raw_campsites(current_app, highest_rated_campsites_by_overall_raw)
         if user_created_campsites_raw:
@@ -211,6 +208,41 @@ def create():
     return redirect(url_for("app_blueprint.index", curr_modal="create-site-modal"))
                     
                 
+@app_blueprint.route("/search-by-location", methods=["GET"])
+def search_by_location():
+    search_type = request.args.get("search-type")
+    search_term = f"%{request.args.get('search-term')}%"
+
+    site_ids = campsite_manager.fetch_by_areas(current_app, search_type, search_term, 9)
+
+    if (len(site_ids) < 1):
+        return jsonify({
+            "status": 200,
+            "count": 0,
+            "message": f"No site found under {search_type} {search_term}",
+            "campsites": [],
+            "success": True
+        })
+
+    sites = None
+    print(site_ids)
+    with current_app.retrieve_db_connection() as (connection, cursor):
+        try:
+            cursor.execute(f"SELECT * FROM site WHERE site_ID IN {tuple(site_ids)}")
+        except Exception as e:
+            logging.error(f"failure to retrieve site by location type and name from site : {e}")
+        else:
+            sites = [Campsite(current_app, **row) for row in cursor.fetchall()]
+
+    return jsonify({
+            "status": 200,
+            "count": 0,
+            "message": "Sites found",
+            "campsites": sites,
+            "success": True
+        })
+
+
 
         
 
