@@ -43,19 +43,19 @@ class CampsitesManager:
     def fetch_by_areas(self, app, search_type, search_term, offset, limit):
         if limit < 1:
             raise LimitError()
-        if offset < 1:
+        if offset < 0:
             raise LimitError()
 
         site_ids = None
 
         with app.retrieve_db_connection() as (connection, cursor):
             try:
-                cursor.execute("""SELECT s.*
+                cursor.execute(f"""SELECT s.*
                                   FROM site as s
                                   JOIN area as a 
                                   ON s.area_ID = a.area_ID
-                                  WHERE a.%s LIKE %s
-                                  LIMIT %s OFFSET %s""", (search_type, search_term, limit, offset))
+                                  WHERE a.{search_type} LIKE %s
+                                  LIMIT %s OFFSET %s""", (search_term, limit, offset))
             except Exception as e:
                 logging.error(f"failure to retrieve sites from location type and name : {e}")
             else:
@@ -165,6 +165,34 @@ class CampsitesManager:
 
 
 class Campsite:
+    """ the fetch data method will return non formatted data directly from sql queries
+        that looks like this - come up with a standaradized approach to formatting after finishing mvp
+        currently only serialize method will handle this along with hacky constructor format
+        [
+        {'ratings': 
+            {
+                'overall': [{'avg': Decimal('9.00000000')}],
+                'cleanliness': [{'AVG(r.cleanliness)': Decimal('9.2000')}],
+                'accessibility': [{'AVG(r.accessibility)': Decimal('8.6000')}],
+                'quietness': [{'AVG(r.quietness)': Decimal('9.8000')}],
+                'activities': [{'AVG(r.activities)': Decimal('9.2000')}],
+                'amenities': [{'AVG(r.amenities)': Decimal('8.4000')}],
+                'cost': [{'AVG(r.cost)': Decimal('8.8000')}]
+            },
+            'comments': [],
+            'rules': [],
+            'filepaths': ['./static/campsite_photos/template.jfif'],
+            'area': [
+                {
+                    'name': 'Yosemite Valley Campground',
+                    'state': 'CA',
+                    'county': 'Mariposa',
+                    'street_address': '9000 Yosemite Valley Rd',
+                    'zipcode': '95389'
+                }
+            ]
+            }
+                """
     RATING_CATEGORIES = ("cleanliness", "accessibility", "quietness", "activities", "amenities", "cost")
     def __init__(self, app, **kwargs):
         for key, value in kwargs.items():
@@ -177,7 +205,29 @@ class Campsite:
         self.activities_score = None
         self.amenities_score = None
         self.cost_score = None
-        self.rating_category_scores = {
+        self.comments: list = None
+        self.rules: list = None 
+        self.filepaths: list = None
+        self.area: dict = None
+        
+        self._fetch_related_data(app)
+
+        self.rating_categories = {
+            "overall_score" : self.overall_score,
+            "cleanliness_score" : self.cleanliness_score,
+            "accessibility_score" : self.accessibility_score,
+            "quietness_score": self.quietness_score,
+            "activities_score" : self.activities_score,
+            "amenities_score" : self.amenities_score,
+            "cost_score": self.cost_score
+        }
+        self._clean_rating_scores()
+        self.filepaths = [row["filepath"] for row in self.filepaths]
+        self.area = self.area[0]
+        self.rules = [row["rule"] for row in self.rules] if len(self.rules) > 0 else []
+
+    def serialize(self):
+        rating_category_scores = {
             "overall": self.overall_score,
             "cleanliness": self.cleanliness_score,
             "accessibility": self.accessibility_score,
@@ -186,14 +236,20 @@ class Campsite:
             "amenities": self.amenities_score,
             "cost": self.cost_score
         }
-        self.comments: list = None
-        self.rules: list = None 
-        self.filepaths: list = None
-        self.area: dict = None
-
-        self._fetch_related_data(app)
-        self.filepaths = [row["filepath"] for row in self.filepaths]
-
+        serialized_data = {
+            "ratings" : rating_category_scores,
+            "comments" : self.comments,
+            "rules" : self.rules,
+            "filepaths" : self.filepaths,
+            "area": self.area
+        }
+        return serialized_data
+    
+    def _clean_rating_scores(self,):
+        for attr, rating in self.rating_categories.items():
+            cleaned_number = float(list(rating[0].values())[0])
+            setattr(self, attr, cleaned_number)
+            
 
     def _fetch_related_data(self, app):
         queries = {

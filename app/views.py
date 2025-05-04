@@ -212,8 +212,8 @@ def create():
 def search_by_location():
     search_type = request.args.get("search-type")
     search_term = f"%{request.args.get('search-term')}%"
-
-    site_ids = campsite_manager.fetch_by_areas(current_app, search_type, search_term, 9)
+    print(search_term, search_type)
+    site_ids = campsite_manager.fetch_by_areas(current_app, search_type, search_term, 0, 9)
 
     if (len(site_ids) < 1):
         return jsonify({
@@ -232,11 +232,11 @@ def search_by_location():
         except Exception as e:
             logging.error(f"failure to retrieve site by location type and name from site : {e}")
         else:
-            sites = [Campsite(current_app, **row) for row in cursor.fetchall()]
-
+            sites = [Campsite(current_app, **row).serialize() for row in cursor.fetchall()]
+    print(sites)
     return jsonify({
             "status": 200,
-            "count": 0,
+            "count": len(sites),
             "message": "Sites found",
             "campsites": sites,
             "success": True
