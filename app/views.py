@@ -54,19 +54,37 @@ def index(curr_modal=None):
 
     
     # campsite retrieval
-    most_popular_campsites = []
-    highest_rated_sites_by_overall = campsite_manager.fetch_by_overall_rating(current_app, limit=5)
+    highest_rated_campsites_by_overall: list = None
+    highest_rated_campsites_by_overall_raw: list = None
+    highest_rated_campsites_by_overall_ids: list = campsite_manager.fetch_by_overall_rating(current_app, limit=5)
     
-    if highest_rated_sites_by_overall:
-        with current_app.retrieve_db_connection() as (connection, cursor):
+    user_created_campsites: list = None
+    user_created_campsites_raw: list = None
+
+    with current_app.retrieve_db_connection() as (connection, cursor):
+        if current_user:
             try:
-                cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_sites_by_overall)}")
+                cursor.execute("SELECT * FROM site WHERE creator_ID = %s LIMIT 5", (current_user.id,))
+            except Exception as e:
+                logging.error(f"failure to retrieve current user's created sites : {e}")
+            else:
+                user_created_campsites_raw = cursor.fetchall()
+
+        if highest_rated_campsites_by_overall_ids:
+            try:
+                cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_campsites_by_overall_ids)}")
             except Exception as e:
                 logging.error(f"Failure to load sites from highest rated sites: {e}")
             else:
-                for site in cursor.fetchall():
-                    new_campsite = Campsite(current_app, **site)
-                    most_popular_campsites.append(new_campsite)
+                highest_rated_campsites_by_overall_raw = cursor.fetchall()
+
+
+        print(highest_rated_campsites_by_overall_raw)
+        print(user_created_campsites_raw)
+        if highest_rated_campsites_by_overall_raw:
+            highest_rated_campsites_by_overall = CampsitesManager.process_raw_campsites(current_app, highest_rated_campsites_by_overall_raw)
+        if user_created_campsites_raw:
+            user_created_campsites = CampsitesManager.process_raw_campsites(current_app, user_created_campsites_raw)
 
     return render_template(
         "index.html",
@@ -75,7 +93,8 @@ def index(curr_modal=None):
         login_form=login_form,
         login_form_handler=login_form_handler,
         create_site_form=create_site_form,
-        campsites=most_popular_campsites,
+        highest_rated_campsites_by_overall=highest_rated_campsites_by_overall,
+        user_created_campsites=user_created_campsites,
         curr_modal=curr_modal
     )
 

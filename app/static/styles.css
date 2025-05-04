@@ -107,8 +107,8 @@ p {
 .form-container {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   background: linear-gradient(to bottom right, var(--bg-light-green), var(--bg-dark-green));
-  border: 4px solid var(--accent-border-light);
-  border-radius: 2%;
+  border: 2px solid var(--accent-border-light);
+ 
   position: relative;
 }
 
@@ -123,17 +123,9 @@ p {
   color : white;
 }
 .grid {
-  margin-top: 50px;
-  width: 75vw;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8vw;
-}
-.grid-item {
-  background-color: var(--bg-light-grey);
-  border: 4px solid var(--accent-border-dark);
-  width: 100%;
-  height: 100%;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 300px);
 }
 .top-left {
   position: absolute;
@@ -194,8 +186,8 @@ p {
   width: 4%;
 }
 .fit {
-  width: fit;
-  height: fit;
+  width: fit-content;
+  height: fit-content;
 }
 
 .background-primary {

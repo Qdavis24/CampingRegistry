@@ -31,6 +31,15 @@ class CampsitesManager:
         self.highest_rated_by_cost = []
 
         self.area_map = {}
+    
+    def process_raw_campsites(app, raw_campsites: list):
+        processed_campsites = []
+        for campsite in raw_campsites:
+            print(campsite)
+            new_campsite = Campsite(app, **campsite)
+            processed_campsites.append(new_campsite)
+        return processed_campsites
+        
 
     def fetch_by_area(self, app, area_id, offset, limit):
         """ Fetches the campsite IDs for a given area ID.

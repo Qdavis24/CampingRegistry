@@ -22,12 +22,12 @@
     <a href="/logout"><button class="button fit top-right flex flex-center">Logout</button></a>
 
     {% else %}
-    <div class="flex-col flex-gap-sm top-right">
+    <div class="flex-row flex-gap-sm top-right">
       <button class="button fit flex flex-center" onclick="loadModal('login-modal')">Login</button>
       <button class="button fit flex flex-center" onclick="loadModal('register-modal')">Register</button>
     </div>
     {%endif%}
-    <h1>{% block title %}{% endblock %}</h1>
+    <h1 id="hero-heading">{% block title %}{% endblock %}</h1>
   </div>
 
   {% block content %} {% endblock %}
@@ -135,8 +135,11 @@
         loadModal("{{curr_modal}}");
       {% endif %}
       const hero = document.querySelector(".hero");
+      const heroH1 = document.querySelector('#hero-heading');
       const initialHeight = 25; // Initial height in vh
-      const minHeight = 10; // Minimum height in vh
+      const minHeight = 8; // Minimum height in vh
+      const initialFontSize = 90;
+      const minFontSize = 40;
 
       window.addEventListener("scroll", function () {
         // Convert scroll pixels to vh units (approx)
@@ -145,9 +148,11 @@
 
         // Decrease height by exact scroll amount in vh
         const newHeight = Math.max(initialHeight - scrollVh, minHeight);
+        const newFontSize = Math.max(initialFontSize - scrollVh*2.7, minFontSize);
 
         // Apply new height
         hero.style.height = newHeight + "vh";
+        heroH1.style.cssText = `font-size: ${newFontSize}px !important`;
 
       });
     });
