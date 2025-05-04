@@ -8,6 +8,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Document</title>
   <link rel="Stylesheet" type="text/css" href="../static/styles.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 
 <body>
@@ -17,7 +18,7 @@
     {% if current_user.is_authenticated %}
     <div class="flex-row flex-gap-sm top-left fit">
       <button class="button flex flex-center" onclick="loadModal('create-site-modal')">Create</button>
-      <a href="/liked"><button class="button flex flex-center">Liked</button></a>
+      <a href="/"><button class="button flex flex-center">Home</button></a>
     </div>
     <a href="/logout"><button class="button fit top-right flex flex-center">Logout</button></a>
 
@@ -131,9 +132,6 @@
     
     const modals = document.querySelectorAll('modal');
     document.addEventListener("DOMContentLoaded", function () {
-      {% if curr_modal %}
-        loadModal("{{curr_modal}}");
-      {% endif %}
       const hero = document.querySelector(".hero");
       const heroH1 = document.querySelector('#hero-heading');
       const initialHeight = 25; // Initial height in vh

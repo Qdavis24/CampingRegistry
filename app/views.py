@@ -1,4 +1,4 @@
-from .forms import LoginForm, RegisterForm, CreatSiteForm
+from .forms import LoginForm, RegisterForm, CreatSiteForm, RatingSiteForm, CommentSiteForm
 from .util_classes import FormHandler, CampsitesManager, User, Campsite
 from .exceptions import LimitError
 from flask_login import login_user, login_required, current_user, logout_user
@@ -243,7 +243,86 @@ def search_by_location():
         })
 
 
+@app_blueprint.route("/campsite", methods=["GET"])
+def campsite():
+    rating_site_form: RatingSiteForm = RatingSiteForm()
+    rating_site_form_handler: FormHandler = FormHandler(rating_site_form)
+    
+    comment_site_form: CommentSiteForm = CommentSiteForm()
+    comment_site_form_handler: FormHandler = FormHandler(comment_site_form)
+    
+    register_form: RegisterForm = session.pop("register_form", None) or RegisterForm()
+    register_form_handler: FormHandler = FormHandler(register_form)
 
-        
+    login_form: LoginForm = session.pop("login_form", None) or LoginForm()
+    login_form_handler: FormHandler = FormHandler(login_form)
+
+    create_site_form: CreatSiteForm = session.pop("create_site_form", None) or CreatSiteForm(current_app)
+
+    campsite_id = request.args.get("site_ID")
+    if not campsite_id:
+        return redirect(url_for("app_blueprint.index"))
+    
+    with current_app.retrieve_db_connection() as (connection, cursor):
+        cursor.execute("SELECT * FROM site WHERE site_ID = %s", (campsite_id,))
+        campsite = Campsite(current_app, **cursor.fetchone())
+    return render_template("site.html", campsite=campsite,
+                           register_form=register_form,
+        register_form_handler=register_form_handler,
+        login_form=login_form,
+        login_form_handler=login_form_handler,
+        create_site_form=create_site_form,
+        comment_site_form=comment_site_form,
+        comment_site_form_handler=comment_site_form_handler,
+        rating_site_form_handler=rating_site_form_handler,
+        rating_site_form=rating_site_form)
+
+@app_blueprint.route("/campsite/rate", methods=["POST"])
+@login_required
+def rate_campsite():
+    rating_site_form = RatingSiteForm()
+    if rating_site_form.validate_on_submit():
+        site_id = request.form.get("site_id")
+        cleanliness_rating = rating_site_form.cleanliness_rating.data
+        accessibility_rating = rating_site_form.accessibility_rating.data
+        quietness_rating = rating_site_form.quietness_rating.data
+        activities_rating = rating_site_form.activities_rating.data
+        amenities_rating = rating_site_form.amenities_rating.data
+        cost_rating = rating_site_form.cost_rating.data
+
+        with current_app.retrieve_db_connection() as (connection, cursor):
+            try:
+                cursor.execute("""INSERT INTO rating (cleanliness, accessibility, quietness, activities, amenities, cost, site_ID)
+                                VALUES (%s, %s, %s, %s, %s, %s, %s)""",
+                                (cleanliness_rating, accessibility_rating, quietness_rating,
+                                 activities_rating, amenities_rating, cost_rating, site_id))
+            except Exception as e:
+                logging.error(f"failure to insert new site rating : {e}")
+                connection.rollback()
+            else:
+                connection.commit()
+    return redirect(url_for("app_blueprint.campsite", site_ID=site_id))
+
+
+@app_blueprint.route("/campsite/comment", methods=["POST"])
+@login_required
+def comment_campsite():
+    comment_site_form = CommentSiteForm()
+    if comment_site_form.validate_on_submit():
+        site_id = request.form.get("site_id")
+        print(site_id)
+        comment = comment_site_form.comment.data
+
+        with current_app.retrieve_db_connection() as (connection, cursor):
+            try:
+                cursor.execute("""INSERT INTO comment (comment, timestamp, user_ID, site_ID)
+                                VALUES (%s, CURRENT_DATE(), %s, %s)""",
+                                (comment, current_user.id, site_id))
+            except Exception as e:
+                logging.error(f"failure to insert new site : {e}")
+                connection.rollback()
+            else:
+                connection.commit()
+    return redirect(url_for("app_blueprint.campsite", site_ID=site_id))
 
     

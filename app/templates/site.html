@@ -1,0 +1,391 @@
+{% extends "./partials/base.html" %} {%block title%}{{campsite.area["name"]}}{%endblock%} {%block content%} {% include 'svgs/svgs.html' %}
+<style>
+  .carousel-container {
+    width: 100%;
+    max-width: 600px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .carousel-slide {
+    display: none;
+    width: 100%;
+  }
+
+  .carousel-slide.active {
+    display: block;
+  }
+
+  .carousel-slide img {
+    width: 100%;
+    height: auto;
+  }
+
+  .carousel-controls {
+    display: flex;
+    justify-content: space-between;
+    position: absolute;
+    top: 50%;
+    width: 100%;
+    transform: translateY(-50%);
+  }
+
+  .carousel-button {
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 18px;
+  }
+
+  .indicators {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+  }
+
+  .indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #ccc;
+    margin: 0 5px;
+    cursor: pointer;
+  }
+
+  .indicator.active {
+    background-color: #333;
+  }
+</style>
+<div class="flex-col width-full-screen">
+  <div class="flex-row flex-center flex-gap-md padding-sm width-full-screen background-secondary-flat">
+    <button class="button fit" id="ratingButton" onclick="loadModal('rating-modal')">Leave a Rating</button>
+    <button class="button fit" id="commentButton" onclick="loadModal('comment-modal')">Leave a Comment</button>
+  </div>
+  <div class="flex-row background-secondary padding-sm flex-center">
+    <div class="flex-col flex-3 flex-center">
+      <div class="flex-col flex-gap-lg">
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Overall:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.overall_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.overall_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Cleanliness:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.cleanliness_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.cleanliness_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Accessibility:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.accessibility_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.accessibility_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Quietness:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.quietness_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.quietness_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Activities:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.activities_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.activities_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Amenities:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.amenities_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.amenities_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+
+        <div class="flex-row flex-gap-lg">
+          <div class="rating-label">Cost:</div>
+          <div class="flex-row flex-gap-lg">
+            {% for star in range(campsite.cost_score |int) %}
+            <svg width="25px" height="25px">
+              <use href="#star-filled" />
+            </svg>
+            {% endfor %} {%for star in range(10-campsite.cost_score | int)%}
+            <svg width="25px" height="25px">
+              <use href="#star-empty" />
+            </svg>
+            {%endfor%}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-3">
+      <div class="carousel-container flex-6">
+        {% for image in campsite.filepaths %}
+        <div class="carousel-slide active">
+          <img src="{{image}}" alt="Slide {{loop.index}}" />
+        </div>
+        {%endfor%}
+        <div class="carousel-controls">
+          <button class="carousel-button prev">&lt;</button>
+          <button class="carousel-button next">&gt;</button>
+        </div>
+        <div class="indicators" id="indicators"></div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-row flex-center">
+    <div class="flex-row flex-gap-xl padding-md">
+      <div class="flex-col flex-gap-md flex-1">
+        <h2>Camping Area Location</h2>
+        <div class="flex-col flex-gap-md">
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 80px">State:</div>
+            <p style="margin: 0">{{campsite.area["state"]}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 80px">County:</div>
+            <p style="margin: 0">{{campsite.area["county"]}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 80px">Address:</div>
+            <p style="margin: 0">{{campsite.area["street_address"]}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 80px">Zipcode:</div>
+            <p style="margin: 0">{{campsite.area["zipcode"]}}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex-col flex-gap-md flex-1">
+        <h2>Coordinates</h2>
+        <div class="flex-col flex-gap-md">
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Longitude:</div>
+            <p style="margin: 0">{{campsite.longitude}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Latitude:</div>
+            <p style="margin: 0">{{campsite.latitude}}</p>
+          </div>
+        </div>
+      </div>
+      <div class="flex-col flex-gap-md flex-1">
+        <h2>Campsite info</h2>
+        <div class="flex-col flex-gap-md">
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Restrooms:</div>
+            <p style="margin: 0">{{campsite.restrooms}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Shower:</div>
+            <p style="margin: 0">{{campsite.shower}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Electrical:</div>
+            <p style="margin: 0">{{campsite.electrical}}</p>
+          </div>
+          <div class="flex-row flex-gap-md">
+            <div class="rating-label" style="width: 100px">Nightly Fee:</div>
+            <p style="margin: 0">${{campsite.nightly_fee}}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex-row flex-center">
+    <div class="flex-col flex-gap-3 width-full-screen background-secondary-flat">
+        <div class="flex flex-center background-primary padding-sm">
+            <h2>Comments</h2>
+        </div>
+        {% if campsite.comments | length > 0 %}
+      {% for comment in campsite.comments %}
+        <div class="flex-col comment-container" style=" border-bottom: 3px solid var(--accent-border-dark);">
+            <span class="comment-timestamp">{{comment["timestamp"]}}</span>
+            <p class="comment-body">"{{comment["comment"]}}"</p>
+        </div>
+      {%endfor%}
+      {%else%}
+        <div class="flex-col comment-container" style=" border-bottom: 3px solid var(--accent-border-dark);">
+            <p class="comment-body">No comments yet.</p>
+        </div>
+      {%endif%}
+
+    </div>
+  </div>
+</div>
+<div class="modal flex flex-center blur-bg" id="rating-modal">
+  <form class="form-container flex-col flex-gap-md flex-center padding-lg" method="POST" action="/campsite/rate">
+    {{ rating_site_form.csrf_token }}
+    <input type="hidden" id="site_id" name="site_id" value="{{campsite.site_ID}}">
+    <svg class="top-center" width="60px" height="60px">
+      <use href="#tent" />
+    </svg>
+    <h2>Leave a rating.</h2>
+    <button type="button" class="button-close top-right" onclick="closeModal('rating-modal')">
+      <svg width="20px" height="20px">
+        <use href="#close-button" />
+      </svg>
+    </button>
+        <div class="flex-row flex-gap-md">
+            <div class="flex-col flex-gap-sm">
+                {{rating_site_form.cleanliness_rating.label(class="flex-1 form-label")}}<br>
+                {{rating_site_form.accessibility_rating.label(class="flex-1 form-label")}}<br>
+                {{rating_site_form.quietness_rating.label(class="flex-1 form-label")}}<br>
+                {{rating_site_form.activities_rating.label(class="flex-1 form-label")}}<br>
+                {{rating_site_form.amenities_rating.label(class="flex-1 form-label")}}<br>
+                {{rating_site_form.cost_rating.label(class="flex-1 form-label")}}<br>
+            </div>
+            <div class="flex-col flex-gap-sm">
+                {{rating_site_form.cleanliness_rating(class="flex-1")}}<br>
+                {{rating_site_form.accessibility_rating(class="flex-1")}}<br>
+                {{rating_site_form.quietness_rating(class="flex-1")}}<br>
+                {{rating_site_form.activities_rating(class="flex-1")}}<br>
+                {{rating_site_form.amenities_rating(class="flex-1")}}<br>
+                {{rating_site_form.cost_rating(class="flex-1")}}<br>
+            </div>
+        </div>
+        {{ rating_site_form.submit(class="button fit") }}
+  </form>
+</div>
+<div class="modal flex flex-center blur-bg" id="comment-modal">
+    <form class="form-container flex-col flex-gap-md flex-center padding-lg" method="POST" action="/campsite/comment">
+      {{ comment_site_form.csrf_token }}
+      <input type="hidden" id="site_id" name="site_id" value="{{campsite.site_ID}}">
+      <svg class="top-center" width="60px" height="60px">
+        <use href="#tent" />
+      </svg>
+      <h2>Leave a comment.</h2>
+      <button type="button" class="button-close top-right" onclick="closeModal('comment-modal')">
+        <svg width="20px" height="20px">
+          <use href="#close-button" />
+        </svg>
+      </button>
+      {{ render_fields_dual_col(comment_site_form, comment_site_form_handler.fields, comment_site_form_handler.break_point) }}
+    </form>
+  </div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Get carousel elements
+    const slides = document.querySelectorAll(".carousel-slide");
+    const prevButton = document.querySelector(".prev");
+    const nextButton = document.querySelector(".next");
+    const indicatorsContainer = document.getElementById("indicators");
+
+    let currentIndex = 0;
+
+    // Create indicators
+    slides.forEach((_, index) => {
+      const indicator = document.createElement("div");
+      indicator.classList.add("indicator");
+      if (index === 0) {
+        indicator.classList.add("active");
+      }
+      indicator.addEventListener("click", () => goToSlide(index));
+      indicatorsContainer.appendChild(indicator);
+    });
+
+    const indicators = document.querySelectorAll(".indicator");
+
+    // Function to show slide
+    function showSlide(index) {
+      // Hide all slides
+      slides.forEach((slide) => {
+        slide.classList.remove("active");
+      });
+
+      // Remove active class from all indicators
+      indicators.forEach((indicator) => {
+        indicator.classList.remove("active");
+      });
+
+      // Show current slide and indicator
+      slides[index].classList.add("active");
+      indicators[index].classList.add("active");
+
+      // Update current index
+      currentIndex = index;
+    }
+
+    // Function to go to specific slide
+    function goToSlide(index) {
+      showSlide(index);
+    }
+
+    // Function to go to next slide
+    function nextSlide() {
+      const newIndex = (currentIndex + 1) % slides.length;
+      showSlide(newIndex);
+    }
+
+    // Function to go to previous slide
+    function prevSlide() {
+      const newIndex = (currentIndex - 1 + slides.length) % slides.length;
+      showSlide(newIndex);
+    }
+
+    // Event listeners for buttons
+    nextButton.addEventListener("click", nextSlide);
+    prevButton.addEventListener("click", prevSlide);
+
+    // Optional: Auto-advance slides every 5 seconds
+    // Uncomment the line below if you want auto-advance
+    // setInterval(nextSlide, 5000);
+  });
+</script>
+{%endblock%}

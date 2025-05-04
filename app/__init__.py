@@ -11,7 +11,7 @@ import logging
 
 logging.basicConfig(filename="./logs/last-run-log.txt", 
                     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    level=logging.ERROR,
+                    level=logging.DEBUG,
                     filemode="w")
 
 # Set Werkzeug's logger level explicitly

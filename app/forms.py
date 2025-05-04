@@ -91,3 +91,17 @@ class CreatSiteForm(FlaskForm):
             logging.error(f"Failure to retrieve areas for create site form: {e}")
         
         self.area.choices = choices
+
+class RatingSiteForm(FlaskForm):
+    cleanliness_rating = SelectField('Cleanliness Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+    accessibility_rating = SelectField('Accessibility Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+    quietness_rating = SelectField('Quietness Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+    activities_rating = SelectField('Activites Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+    amenities_rating = SelectField('Amenities Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+    cost_rating = SelectField('Cost Rating', choices=[(1, '1'), (2, '2'), (3, '3'), (4, '4'), (5, '5'), (6, '6'), (7, '7'), (8, '8'), (9, '9'), (10, '10')], validators=[DataRequired()])
+   
+    submit = SubmitField()
+
+class CommentSiteForm(FlaskForm):
+    comment = TextAreaField('Comment', validators=[DataRequired(), Length(min=1, max=250)])
+    submit = SubmitField()
