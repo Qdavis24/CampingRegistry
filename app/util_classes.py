@@ -80,7 +80,7 @@ class CampsitesManager:
             raise LimitError("Limit must be greater than 0")
         if len(self.highest_rated_by_overall) >= limit:
             return self.highest_rated_by_overall[:limit]
-        
+        overall_rated_site_ids = None
         with app.retrieve_db_connection() as (connection, cursor):
             try:
                 cursor.execute("""SELECT s.site_ID, AVG(r.cleanliness + r.accessibility + r.quietness + r.activities +  r.amenities + r.cost) as overall_score
@@ -94,7 +94,7 @@ class CampsitesManager:
             else:
                 overall_rated_site_ids = [row["site_ID"] for row in cursor.fetchall()]
                 self.highest_rated_by_overall.extend(overall_rated_site_ids[len(self.highest_rated_by_overall):])
-        return overall_rated_site_ids or None
+        return overall_rated_site_ids
     
     def fetch_by_category_rating(self, app, category, limit):
         """ Fetches the highest rated campsites by a specific category.

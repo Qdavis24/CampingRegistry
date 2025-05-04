@@ -1,8 +1,9 @@
 from flask_wtf import FlaskForm
-from wtforms import EmailField, StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length, ValidationError, Regexp
+from wtforms import EmailField, StringField, PasswordField, SubmitField, BooleanField, DecimalField, SelectField, TextAreaField, MultipleFileField
+from wtforms.validators import DataRequired, Length, ValidationError, Regexp, NumberRange
+import logging
 
-
+# region auth forms
 class RegisterForm(FlaskForm):
     email: EmailField = EmailField(
         label="Email", validators=[DataRequired(), Length(min=5, max=50)]
@@ -61,3 +62,32 @@ class LoginForm(FlaskForm):
     def validate_email(self, email):
         if "@" not in email.data or ".com" not in email.data:
             raise ValidationError("Email must be valid email address.")
+# endregion
+
+class CreatSiteForm(FlaskForm):
+    area = SelectField('Area', validators=[DataRequired()], coerce=int)
+    note = TextAreaField('Note')
+    nightly_fee = DecimalField('Fee', validators=[DataRequired()], places=2)
+    electrical = BooleanField('Electrical')
+    restrooms = BooleanField('Restrooms')
+    shower = BooleanField('Shower')
+    photos = MultipleFileField(label="Photos")
+    latitude = DecimalField("Latitude", validators=[DataRequired()], places=7)
+    longitude = DecimalField("Longitude", validators=[DataRequired()], places=7)
+    submit = SubmitField('Create Site')
+    
+    def __init__(self, app, *args, **kwargs):
+        super(CreatSiteForm, self).__init__(*args, **kwargs)
+        self.populate_area_choices(app)
+    
+    def populate_area_choices(self, app):
+        """Populate area choices from database"""
+        choices = []
+        try:
+            with app.retrieve_db_connection() as (connection, cursor):
+                cursor.execute("SELECT area_ID, name FROM area;")
+                choices = [(row["area_ID"], row["name"]) for row in cursor.fetchall()]
+        except Exception as e:
+            logging.error(f"Failure to retrieve areas for create site form: {e}")
+        
+        self.area.choices = choices

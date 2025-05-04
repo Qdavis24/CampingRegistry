@@ -1,4 +1,5 @@
-
+DELETE FROM site;
+SELECT * FROM site;
 INSERT INTO site (timestamp, note, electrical, restrooms, shower, nightly_fee, latitude, longitude, area_ID, creator_ID) VALUES
 -- Area 1 campsites
 ('2025-04-15', 'Beautiful mountain vista with easy access to hiking trails. Fire rings available.', 0, 1, 0, 15.00, 38.5492, -107.2495, 1, 1),

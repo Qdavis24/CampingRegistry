@@ -27,7 +27,6 @@ def create_app():
     app.config.from_object(Config)
     app.register_blueprint(app_blueprint)
     
-    
     try:
         dbconfig = {
             "database": Config.MYSQL_DATABASE,

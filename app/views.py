@@ -1,11 +1,13 @@
-from .forms import LoginForm, RegisterForm
+from .forms import LoginForm, RegisterForm, CreatSiteForm
 from .util_classes import FormHandler, CampsitesManager, User, Campsite
 from .exceptions import LimitError
 from flask_login import login_user, login_required, current_user, logout_user
-from flask import render_template, url_for, Blueprint, redirect, current_app, flash
+from flask import render_template, url_for, Blueprint, redirect, current_app, flash, session
 from werkzeug.security import generate_password_hash, check_password_hash
 from mysql.connector import MySQLConnection
 import logging
+import uuid
+import os
 
 
 
@@ -13,36 +15,71 @@ app_blueprint = Blueprint("app_blueprint", "app_blueprint")
 
 campsite_manager = CampsitesManager()
 
+UPLOAD_PATH = "./static/campsite_photos"
 
-@app_blueprint.route("/", methods=["GET"])
-def index(register_form=None, login_form=None):
-    register_form: RegisterForm = register_form or RegisterForm()
-    register_form_handler: FormHandler = FormHandler(register_form)
-    login_form: LoginForm = login_form or LoginForm()
-    login_form_handler: FormHandler = FormHandler(login_form)
+def save_files(files):
+    uploaded_files = files
+    saved_file_paths = []
     
-    campsites = []
-    highest_rated_sites_by_overall = campsite_manager.fetch_by_overall_rating(current_app, limit=5)
+    if uploaded_files:
+        # Ensure directory exists
+        os.makedirs(UPLOAD_PATH, exist_ok=True)
+        
+        for file in uploaded_files:
+            if file.filename:
+                # Generate a unique filename using UUID
+                original_ext = os.path.splitext(file.filename)[1]
+                unique_filename = f"{uuid.uuid4()}{original_ext}"
+                
+                # Create full filepath
+                file_path = os.path.join(UPLOAD_PATH, unique_filename)
+                
+                # Save the file
+                file.save(file_path)
+                saved_file_paths.append(file_path)
+    
+    return saved_file_paths
 
-    with current_app.retrieve_db_connection() as (connection, cursor):
-        try:
-            cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_sites_by_overall)}")
-        except Exception as e:
-            logging.error(f"Failure to load sites from highest rated sites: {e}")
-        else:
-            for site in cursor.fetchall():
-                new_campsite = Campsite(current_app, **site)
-                campsites.append(new_campsite)
-    print(campsites[0].area)
+
+@app_blueprint.route("/", methods=["GET", "POST"])
+def index(curr_modal=None):
+    # auth forms setup
+    register_form: RegisterForm = session.pop("register_form", None) or RegisterForm()
+    register_form_handler: FormHandler = FormHandler(register_form)
+
+    login_form: LoginForm = session.pop("login_form", None) or LoginForm()
+    login_form_handler: FormHandler = FormHandler(login_form)
+
+    create_site_form: CreatSiteForm = session.pop("create_site_form", None) or CreatSiteForm(current_app)
+
+    
+    # campsite retrieval
+    most_popular_campsites = []
+    highest_rated_sites_by_overall = campsite_manager.fetch_by_overall_rating(current_app, limit=5)
+    
+    if highest_rated_sites_by_overall:
+        with current_app.retrieve_db_connection() as (connection, cursor):
+            try:
+                cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_sites_by_overall)}")
+            except Exception as e:
+                logging.error(f"Failure to load sites from highest rated sites: {e}")
+            else:
+                for site in cursor.fetchall():
+                    new_campsite = Campsite(current_app, **site)
+                    most_popular_campsites.append(new_campsite)
+
     return render_template(
         "index.html",
         register_form=register_form,
         register_form_handler=register_form_handler,
         login_form=login_form,
         login_form_handler=login_form_handler,
-        campsites=campsites,
+        create_site_form=create_site_form,
+        campsites=most_popular_campsites,
+        curr_modal=curr_modal
     )
 
+#region auth
 
 @app_blueprint.route("/register", methods=["POST"])
 def register():
@@ -75,8 +112,8 @@ def register():
                 login_user(cursor.lastrowid)
 
         return redirect(url_for("app_blueprint.index"))
-    
-    return redirect(url_for("app_blueprint.index", register_form=register_form))
+    session["register_form"] = register_form
+    return redirect(url_for("app_blueprint.index", curr_modal="register-modal"))
 
 @app_blueprint.route("/login", methods=["POST"])
 def login():
@@ -91,7 +128,6 @@ def login():
                 logging.error(f"ERROR login database query : {e}")
             else:
                 user = cursor.fetchone()
-                print(user)
                 if not user:
                     flash("Email entered does not exists.")
                     return redirect(url_for("app_blueprint.index"))
@@ -100,7 +136,8 @@ def login():
                     
             
         return redirect(url_for("app_blueprint.index"))
-    return redirect(url_for("app_blueprint.index", login_form=login_form))
+    session["login_form"] = login_form
+    return redirect(url_for("app_blueprint.index", curr_modal="login-modal"))
 
 @login_required
 @app_blueprint.route("/logout", methods=["GET"])
@@ -108,4 +145,54 @@ def logout():
     logout_user()
     return redirect(url_for("app_blueprint.index"))
     
+#endregion
+
+@login_required
+@app_blueprint.route("/create", methods=["GET", "POST"])
+def create():
+    create_site_form = CreatSiteForm(current_app)
+    if create_site_form.validate_on_submit():
+        area_ID: int = create_site_form.area.data
+        note: str = create_site_form.note.data
+        electrical: bool = create_site_form.electrical.data
+        restrooms: bool = create_site_form.restrooms.data
+        shower: bool = create_site_form.shower.data
+        nightly_fee: float = create_site_form.nightly_fee.data
+        latitude: float = create_site_form.latitude.data
+        longitude: float = create_site_form.longitude.data
+
+        with current_app.retrieve_db_connection() as (connection, cursor):
+            try:
+                try:
+                    cursor.execute("""INSERT INTO site (timestamp, note, electrical, restrooms, shower, nightly_fee, latitude, longitude, area_ID, creator_ID)
+                                    VALUES (CURRENT_DATE(), %s, %s, %s, %s, %s, %s, %s, %s, %s)""",
+                                    (note, electrical, restrooms, shower, nightly_fee, latitude, longitude, area_ID, current_user.id))
+                except Exception as e:
+                    logging.error(f"failure to insert new site : {e}")
+                else:
+                    site_ID = cursor.lastrowid
+                
+                filepaths = save_files(create_site_form.photos.data)
+
+                if filepaths:
+                    for filepath in filepaths:
+                        try:
+                            cursor.execute("""INSERT INTO photo (filepath, site_ID)
+                                            VALUES(%s, %s)""", (filepath, site_ID))
+                        except Exception as e:
+                            logging.error(f"failure to insert filepath {filepath} : {e}")
+            except Exception as e:
+                flash("Site failed to save")
+                connection.rollback()
+                logging.error(f"failure to upload site : {e} - rolling back queries")
+            else:
+                connection.commit()        
+        return redirect(url_for("app_blueprint.index"))
+    session["create_site_form"] = create_site_form
+    return redirect(url_for("app_blueprint.index", curr_modal="create-site-modal"))
+                    
+                
+
+        
+
     

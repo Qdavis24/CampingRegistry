@@ -1,71 +1,166 @@
 {% include 'svgs/svgs.html' %}
+{% from "macros/form_macros.html" import render_fields_dual_col %}
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
-    <link rel="Stylesheet" type="text/css" href="../static/styles.css" />
-  </head>
 
-  <body>
-    <div class="hero-container"></div>
-    <div class="flex flex-center hero">
-      {% if current_user.is_authenticated %}
-      <a href="/logout"><button class="button button-xsmall top-right flex flex-center">Logout</button></a>
-      {% else %}
-      <div class="flex-col flex-gap-sm top-right">
-        <button class="button fit flex flex-center" onclick="loadModal('login-modal')">Login</button>
-        <button class="button fit flex flex-center" onclick="loadModal('register-modal')">Register</button>
-      </div>
-      {%endif%}
-      <h1>{% block title %}{% endblock %}</h1>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+  <link rel="Stylesheet" type="text/css" href="../static/styles.css" />
+</head>
+
+<body>
+
+  <div class="hero-container"></div>
+  <div class="flex flex-center hero">
+    {% if current_user.is_authenticated %}
+    <div class="flex-row flex-gap-sm top-left fit">
+      <button class="button flex flex-center" onclick="loadModal('create-site-modal')">Create</button>
+      <a href="/liked"><button class="button flex flex-center">Liked</button></a>
     </div>
+    <a href="/logout"><button class="button fit top-right flex flex-center">Logout</button></a>
 
-    {% block content %} {% endblock %}
-    <div class="modal flex flex-center blur-bg" id="register-modal">
-      <form class="form-container flex-col flex-gap-md flex-center" method="POST" action="/register">
-        <svg width="60px" height="60px">
+    {% else %}
+    <div class="flex-col flex-gap-sm top-right">
+      <button class="button fit flex flex-center" onclick="loadModal('login-modal')">Login</button>
+      <button class="button fit flex flex-center" onclick="loadModal('register-modal')">Register</button>
+    </div>
+    {%endif%}
+    <h1>{% block title %}{% endblock %}</h1>
+  </div>
+
+  {% block content %} {% endblock %}
+  <div class="modal flex flex-center blur-bg" id="register-modal">
+    <form class="form-container flex-col flex-gap-md flex-center padding-lg" method="POST" action="/register">
+      <svg class="top-center" width="60px" height="60px">
+        <use href="#tent" />
+      </svg>
+      <h2>Create an account.</h2>
+      <button class="button-close top-right" onclick="closeModal('register-modal')">
+        <svg width="20px" height="20px">
+          <use href="#close-button"/>
+        </svg>
+      </button>
+      {{ render_fields_dual_col(register_form, register_form_handler.fields, register_form_handler.break_point) }}
+    </form>
+  </div>
+  <div class="modal flex flex-center blur-bg" id="login-modal">
+    <form class="form-container flex-col flex-gap-md flex-center padding-lg" method="POST" action="/login">
+      <svg class="top-center" width="60px" height="60px">
+        <use href="#tent" />
+      </svg>
+      <h2>Sign in.</h2>
+      <button class="button-close top-right" onclick="closeModal('login-modal')">
+        <svg width="20px" height="20px">
+          <use href="#close-button"/>
+        </svg>
+      </button>
+      {{ render_fields_dual_col(login_form, login_form_handler.fields, login_form_handler.break_point) }}
+    </form>
+  </div>
+  <div class="modal flex flex-center blur-bg" id="create-site-modal">
+      <form class="form-container flex-col flex-gap-md flex-center" enctype="multipart/form-data" method="POST" action="/create">
+        {{ create_site_form.csrf_token }}
+        <svg class="top-center" width="60px" height="60px">
           <use href="#tent" />
         </svg>
-        <button class="button-close fit top-right" onclick="closeModal('register-modal')">X</button>
-        {{ render_fields(register_form, register_form_handler.fields, register_form_handler.break_point) }}
+        <button class="button-close top-right" onclick="closeModal('create-site-modal')">
+          <svg width="20px" height="20px">
+            <use href="#close-button"/>
+          </svg>
+        </button>
+        <div class="flex-col flex-gap-lg padding-lg">
+
+          <div class="flex-row flex-gap-lg">
+            {{create_site_form.area.label(class="flex-1 form-label")}}
+            {{create_site_form.area(class="flex-9")}}
+          </div>
+          <div class="flex-row flex-gap-lg">
+            {{create_site_form.note.label(class="flex-1 form-label")}}
+            {{create_site_form.note(class="flex-9", style="height: 200px; width: 300px;")}}
+          </div>
+          <div class="flex-row flex-gap-lg">
+            <div class="flex-col flex-gap-lg">
+              {{create_site_form.nightly_fee.label(class="flex-1 form-label")}}
+              {{create_site_form.latitude.label(class="flex-1 form-label")}}
+              {{create_site_form.longitude.label(class="flex-1 form-label")}}
+            </div>
+            <div class="flex-col flex-gap-lg">
+              {{create_site_form.nightly_fee()}}
+              {{create_site_form.latitude()}}
+              {{create_site_form.longitude()}}
+            </div>
+          </div>
+          <div class="flex-row flex-gap-lg">
+            <div class="flex-row flex-gap-lg">
+              {{create_site_form.electrical.label(class="flex-1 form-label")}}
+              <div class="flex-9">
+                {{create_site_form.electrical()}}
+              </div>
+            </div>
+            <div class="flex-row flex-gap-lg">
+              {{create_site_form.restrooms.label(class="flex-1 form-label")}}
+              <div class="flex-9">
+                {{create_site_form.restrooms()}}
+              </div>
+
+            </div>
+            <div class="flex-row flex-gap-lg">
+              {{create_site_form.shower.label(class="flex-1 form-label")}}
+              <div class="flex-9">
+                {{create_site_form.shower()}}
+              </div>
+
+            </div>
+            
+          </div>
+          <div class="flex-row flex-gap-lg">
+            {{create_site_form.photos.label(class="flex-1 form-label")}}
+            <div class="flex-9">
+              {{create_site_form.photos()}}
+            </div>
+
+          </div>
+          {{create_site_form.submit(class="button button-sm", style="margin-top: 10px;")}}
+        </div>
       </form>
-    </div>
-    <div class="modal flex flex-center blur-bg" id="login-modal">
-      <form class="form-container flex-col flex-gap-md flex-center" method="POST" action="/login">
-        <svg width="60px" height="60px">
-          <use href="#tent" />
-        </svg>
-        <button class="button-close top-right" onclick="closeModal('login-modal')">X</button>
-        {{ render_fields(login_form, login_form_handler.fields, login_form_handler.break_point) }}
-      </form>
-    </div>
-    <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        const hero = document.querySelector(".hero");
-        const initialHeight = 25; // Initial height in vh
-        const minHeight = 10; // Minimum height in vh
+  </div>
 
-        window.addEventListener("scroll", function () {
-          // Convert scroll pixels to vh units (approx)
-          const viewportHeight = window.innerHeight;
-          const scrollVh = (window.scrollY / viewportHeight) * 100;
+  <script>
+    
+    const modals = document.querySelectorAll('modal');
+    document.addEventListener("DOMContentLoaded", function () {
+      {% if curr_modal %}
+        loadModal("{{curr_modal}}");
+      {% endif %}
+      const hero = document.querySelector(".hero");
+      const initialHeight = 25; // Initial height in vh
+      const minHeight = 10; // Minimum height in vh
 
-          // Decrease height by exact scroll amount in vh
-          const newHeight = Math.max(initialHeight - scrollVh, minHeight);
+      window.addEventListener("scroll", function () {
+        // Convert scroll pixels to vh units (approx)
+        const viewportHeight = window.innerHeight;
+        const scrollVh = (window.scrollY / viewportHeight) * 100;
 
-          // Apply new height
-          hero.style.height = newHeight + "vh";
+        // Decrease height by exact scroll amount in vh
+        const newHeight = Math.max(initialHeight - scrollVh, minHeight);
 
-        });
+        // Apply new height
+        hero.style.height = newHeight + "vh";
+
       });
-      function loadModal(modalId) {
-        document.getElementById(modalId).classList.add("active");
-      }
-      function closeModal(modalId) {
-        document.getElementById(modalId).classList.remove("active");
-      }
-    </script>
-  </body>
+    });
+    function loadModal(modalId) {
+      modals.forEach(function (modal) {
+        if (modal.id != modalId) modal.classList.remove('active');
+      });
+      document.getElementById(modalId).classList.add("active");
+    }
+    function closeModal(modalId) {
+      document.getElementById(modalId).classList.remove("active");
+    }
+  </script>
+</body>
+
 </html>

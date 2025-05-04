@@ -63,7 +63,7 @@ p {
   height: 25vh; /* Initial height */
   position:fixed; /* Change from relative to sticky */
   top: 0; /* Stick to top of viewport */
-  z-index: 100; /* Ensure it stays above other content */
+  z-index: 1; /* Ensure it stays above other content */
   background-image: url("../static/hero_backdrop.jpg");
   background-size: cover;
   background-position-y: 62%;
@@ -78,8 +78,9 @@ p {
   height: 10vh; /* Smaller height when scrolled */
 }
 .hero-container {
+  margin: 0;
     width: 100%;
-    height: 25vh; 
+    height: 20vh; 
 }
 .blur-bg {
   -webkit-backdrop-filter: blur(4px);
@@ -92,7 +93,7 @@ p {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1;
+  z-index: 2;
   width: 100vw;
   height: 100vh;
   opacity: 0;
@@ -105,8 +106,7 @@ p {
 }
 .form-container {
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  background: linear-gradient(to bottom right, var(--bg-light-grey), var(--bg-dark-grey));
+  background: linear-gradient(to bottom right, var(--bg-light-green), var(--bg-dark-green));
   border: 4px solid var(--accent-border-light);
   border-radius: 2%;
   position: relative;
@@ -120,7 +120,7 @@ p {
 
 .form-label {
   font-family: "Roboto", sans-serif;
-  margin-top: 10px;
+  color : white;
 }
 .grid {
   margin-top: 50px;
@@ -135,7 +135,11 @@ p {
   width: 100%;
   height: 100%;
 }
-
+.top-left {
+  position: absolute;
+  top:10px;
+  left: 20px;
+}
 .top-right {
   position: absolute;
   top: 10px;
@@ -143,7 +147,7 @@ p {
 }
 .top-center {
   position: absolute;
-  top: 5px;
+  top: 0;
 }
 .button:hover {
   background-color: var(--bg-button-medium-blue);
@@ -161,15 +165,18 @@ p {
   transition: background-color 0.2s ease-in-out;
 }
 .button-close {
-  padding: 4px;
-  height: fit;
-  width: auto;
-  border-radius: 50%;
-  background-color: red;
-  transition: background-color 0.2s ease-in-out;
+  padding: 5px;
+  height: fit-content;
+  width: fit-content;
+  opacity: .3;
+  border: solid 2px var(--accent-border-light);
+  border-radius: 100%;
+  background-color: var(--bg-dark-grey);
+  transition: opacity, background-color 0.2s ease-in-out;
 }
 .button-close:hover {
-  background-color: lightcoral;
+  opacity: .5;
+  background-color: var(--bg-light-grey);
 }
 .button-large {
   width: 30%;
@@ -243,11 +250,20 @@ p {
 .flex-8 {
   flex: 8 0 0%;
 }
+.flex-9 {
+  flex: 9 0 0%;
+}
 .flex-3 {
   flex: 3 0 0%;
 }
 .flex-4 {
   flex: 4 0 0%;
+}
+.flex-2 {
+  flex:2 0 0%;
+}
+.flex-1 {
+  flex: 1  0 0%;
 }
 .width-full-screen {
   width: 100vw;
@@ -323,5 +339,11 @@ p {
   scale: 102%;
 }
 .padding-lg {
-  padding: 2vw;
+  padding: 5vw;
+}
+.padding-md {
+  padding:3vw;
+}
+margin-top-md {
+  margin-top:3vh
 }
