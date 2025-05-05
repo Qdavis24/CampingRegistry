@@ -1,3 +1,1 @@
-2025-05-05 14:35:26,721 - root - ERROR - failure to retrieve current user's created sites : 'AnonymousUserMixin' object has no attribute 'id'
-2025-05-05 14:35:48,976 - root - ERROR - failure to retrieve current user's created sites : 'AnonymousUserMixin' object has no attribute 'id'
-2025-05-05 14:38:06,158 - root - ERROR - failure to retrieve current user's created sites : 'AnonymousUserMixin' object has no attribute 'id'
+2025-05-05 14:48:32,891 - root - ERROR - failure to retrieve current user's created sites : 'AnonymousUserMixin' object has no attribute 'id'

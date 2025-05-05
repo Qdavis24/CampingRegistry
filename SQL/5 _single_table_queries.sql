@@ -20,8 +20,7 @@ FROM user
 WHERE city = "gunnison";
 
 #5. Retrieve all camping areas that are located in gunnison
-SELECT area_ID
+SELECT name
 FROM area
 WHERE city = "gunnison";
 
-#6. Retrieve all the users 
