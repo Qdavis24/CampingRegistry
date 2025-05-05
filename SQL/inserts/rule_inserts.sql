@@ -1,0 +1,16 @@
+INSERT INTO rule (rule) VALUES
+('No campfires during fire bans'),
+('Pack out all trash'),
+('Quiet hours 10PM-7AM'),
+('Pets must be leashed'),
+('No washing dishes in bathroom sinks'),
+('Respect wildlife - do not feed animals'),
+('Maximum stay: 14 days'),
+('Park only in designated areas'),
+('Children must be supervised'),
+('No cutting or damaging trees'),
+('Use bear-proof containers where required'),
+('Never leave fires unattended'),
+('One portable ring to rule them all'),
+('Generator hours: 8AM-8PM only'),
+('Check out time: 12PM noon');

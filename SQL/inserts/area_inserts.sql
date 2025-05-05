@@ -1,4 +1,3 @@
-
 INSERT INTO area (name, state, county, city, street_address, zipcode)
 VALUES
 ('Hartman Rocks', 'CO', 'Gunnison', 'Gunnison', '73 Columbine Rd', '81230'),
@@ -16,7 +15,3 @@ VALUES
 ('North Campground', 'UT', 'Garfield', 'Bryce', 'P.O Box 640201', '84764'),
 ('Devils Garden Campground', 'UT', 'Grand', 'Moab', 'PO Box 907', '84532'),
 ('Fruita Campground', 'UT', 'Wayne', 'Torrey', 'HC 70, Box 15', '84775');
-
-
-
-SELECT * FROM area;

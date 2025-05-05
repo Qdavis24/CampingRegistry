@@ -19,7 +19,7 @@ from werkzeug.utils import secure_filename
 import os
 import uuid
 
-# Define an absolute path for clarity
+
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
 UPLOAD_PATH = os.path.join(BASE_DIR, "static", "campsite_photos")
 
@@ -28,28 +28,21 @@ def save_files(files):
     saved_file_paths = []
     
     if uploaded_files:
-        # Ensure directory exists
         os.makedirs(UPLOAD_PATH, exist_ok=True)
         
         for file in uploaded_files:
             if file.filename:
-                # First secure the original filename
+                
                 original_filename = secure_filename(file.filename)
                 
-                # Get extension from the secured filename
                 _, ext = os.path.splitext(original_filename)
-                
-                # Generate a unique filename with UUID
+            
                 unique_filename = f"{uuid.uuid4()}{ext}"
                 
-                # Create paths using os.path.join to ensure correct slashes for the OS
                 file_path = os.path.join(UPLOAD_PATH, unique_filename)
                 
                 try:
-                    # Save the file to the filesystem
                     file.save(file_path)
-                    
-                    # Create a web path with forward slashes for the database
                     web_path = f"/static/campsite_photos/{unique_filename}"
                     saved_file_paths.append(web_path)
                     
@@ -59,6 +52,13 @@ def save_files(files):
     
     return saved_file_paths
 
+def dynamic_paramaterized_query(query, parameters):
+    for i in range(len(parameters)):
+        query += "%s"
+        if i != len(parameters)-1:
+            query += ", "
+    query += ")"
+    return query
 
 @app_blueprint.route("/", methods=["GET", "POST"])
 def index(curr_modal=None):
@@ -91,7 +91,10 @@ def index(curr_modal=None):
 
         if highest_rated_campsites_by_overall_ids:
             try:
-                cursor.execute(f"SELECT * FROM site WHERE site_ID in {tuple(highest_rated_campsites_by_overall_ids)}")
+                query = dynamic_paramaterized_query("SELECT * FROM site WHERE site_ID IN (", highest_rated_campsites_by_overall_ids)
+                query += " LIMIT 5;"
+                print(query, tuple(highest_rated_campsites_by_overall_ids))
+                cursor.execute(query, tuple(highest_rated_campsites_by_overall_ids))
             except Exception as e:
                 logging.error(f"Failure to load sites from highest rated sites: {e}")
             else:
@@ -237,6 +240,9 @@ def search_by_location():
     search_term = f"%{request.args.get("search-term")}%"
     site_ids = campsite_manager.fetch_by_areas(current_app, search_type, search_term, 0, 9)
 
+    query = "SELECT * FROM site WHERE site_ID IN ("
+
+
     if (len(site_ids) < 1):
         return jsonify({
             "status": 200,
@@ -245,13 +251,20 @@ def search_by_location():
             "campsites": [],
             "success": True
         })
+    
+    for site_id in site_ids:
+        query += "%s"
+        if site_ids.index(site_id) != len(site_ids) - 1:
+            query += ", "
 
+    query += ")"
+    print(query, tuple(site_ids))
     sites = None
     with current_app.retrieve_db_connection() as (connection, cursor):
         try:
-            cursor.execute(f"SELECT * FROM site WHERE site_ID IN {tuple(site_ids)}")
+            cursor.execute(query, tuple(site_ids))
         except Exception as e:
-            logging.error(f"failure to retrieve site by location type and name from site : {e}")
+            logging.error(f"View function: failure to retrieve site by location type and name from site : {e}")
         else:
             sites = [Campsite(current_app, **row).serialize() for row in cursor.fetchall()]
     return jsonify({

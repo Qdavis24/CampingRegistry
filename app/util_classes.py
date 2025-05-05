@@ -38,7 +38,6 @@ class CampsitesManager:
             raise LimitError()
         if offset < 0:
             raise LimitError()
-        
         site_ids = None
         with app.retrieve_db_connection() as (connection, cursor):
             try:
@@ -47,9 +46,9 @@ class CampsitesManager:
                                   JOIN area as a 
                                   ON s.area_ID = a.area_ID
                                   WHERE a.{search_type} LIKE %s
-                                  LIMIT 1 OFFSET %s""", (search_term,offset))
+                                  LIMIT %s OFFSET %s""", (search_term, limit, offset))
             except Exception as e:
-                logging.error(f"failure to retrieve sites from location type and name : {e}")
+                logging.error(f"Util classes Campsite Manager : failure to retrieve sites from location type and name : {e}")
             else:
                 site_ids = [row["site_ID"] for row in cursor.fetchall()]
 
