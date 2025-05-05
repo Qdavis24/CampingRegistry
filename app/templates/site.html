@@ -3,6 +3,7 @@
   .carousel-container {
     width: 100%;
     max-width: 600px;
+    max-height: 500px;
     position: relative;
     overflow: hidden;
   }
@@ -18,7 +19,7 @@
 
   .carousel-slide img {
     width: 100%;
-    height: auto;
+    
   }
 
   .carousel-controls {
@@ -42,7 +43,11 @@
   .indicators {
     display: flex;
     justify-content: center;
-    margin-top: 10px;
+    position: absolute;
+    bottom: 5px;
+    left: 50%;
+
+    
   }
 
   .indicator {
@@ -173,7 +178,7 @@
       </div>
     </div>
     <div class="flex flex-3">
-      <div class="carousel-container flex-6">
+      <div class="carousel-container">
         {% for image in campsite.filepaths %}
         <div class="carousel-slide active">
           <img src="{{image}}" alt="Slide {{loop.index}}" />

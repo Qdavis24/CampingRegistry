@@ -1,7 +1,4 @@
 
-
-
-
 INSERT INTO photo (site_ID, filepath)
 VALUES 
 (1, './static/campsite_photos/template.jfif'),

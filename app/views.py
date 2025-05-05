@@ -1,4 +1,4 @@
-from .forms import LoginForm, RegisterForm, CreatSiteForm, RatingSiteForm, CommentSiteForm
+from .forms import LoginForm, RegisterForm, CreateSiteForm, RatingSiteForm, CommentSiteForm
 from .util_classes import FormHandler, CampsitesManager, User, Campsite
 from .exceptions import LimitError
 from flask_login import login_user, login_required, current_user, logout_user
@@ -15,7 +15,13 @@ app_blueprint = Blueprint("app_blueprint", "app_blueprint")
 
 campsite_manager = CampsitesManager()
 
-UPLOAD_PATH = "./static/campsite_photos"
+from werkzeug.utils import secure_filename
+import os
+import uuid
+
+# Define an absolute path for clarity
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+UPLOAD_PATH = os.path.join(BASE_DIR, "static", "campsite_photos")
 
 def save_files(files):
     uploaded_files = files
@@ -27,16 +33,29 @@ def save_files(files):
         
         for file in uploaded_files:
             if file.filename:
-                # Generate a unique filename using UUID
-                original_ext = os.path.splitext(file.filename)[1]
-                unique_filename = f"{uuid.uuid4()}{original_ext}"
+                # First secure the original filename
+                original_filename = secure_filename(file.filename)
                 
-                # Create full filepath
+                # Get extension from the secured filename
+                _, ext = os.path.splitext(original_filename)
+                
+                # Generate a unique filename with UUID
+                unique_filename = f"{uuid.uuid4()}{ext}"
+                
+                # Create paths using os.path.join to ensure correct slashes for the OS
                 file_path = os.path.join(UPLOAD_PATH, unique_filename)
                 
-                # Save the file
-                file.save(file_path)
-                saved_file_paths.append(file_path)
+                try:
+                    # Save the file to the filesystem
+                    file.save(file_path)
+                    
+                    # Create a web path with forward slashes for the database
+                    web_path = f"/static/campsite_photos/{unique_filename}"
+                    saved_file_paths.append(web_path)
+                    
+                    print(f"Successfully saved file to {file_path}")
+                except Exception as e:
+                    print(f"Error saving file: {e}")
     
     return saved_file_paths
 
@@ -50,7 +69,7 @@ def index(curr_modal=None):
     login_form: LoginForm = session.pop("login_form", None) or LoginForm()
     login_form_handler: FormHandler = FormHandler(login_form)
 
-    create_site_form: CreatSiteForm = session.pop("create_site_form", None) or CreatSiteForm(current_app)
+    create_site_form: CreateSiteForm = session.pop("create_site_form", None) or CreateSiteForm(current_app)
 
     
     # campsite retrieval
@@ -78,10 +97,14 @@ def index(curr_modal=None):
             else:
                 highest_rated_campsites_by_overall_raw = cursor.fetchall()
 
-        if highest_rated_campsites_by_overall_raw:
-            highest_rated_campsites_by_overall = CampsitesManager.process_raw_campsites(current_app, highest_rated_campsites_by_overall_raw)
-        if user_created_campsites_raw:
-            user_created_campsites = CampsitesManager.process_raw_campsites(current_app, user_created_campsites_raw)
+    if highest_rated_campsites_by_overall_raw:
+        highest_rated_campsites_by_overall = [Campsite(current_app, **raw_site) for raw_site in highest_rated_campsites_by_overall_raw]
+    if user_created_campsites_raw:
+        user_created_campsites = [Campsite(current_app, **raw_site) for raw_site in user_created_campsites_raw]
+    
+    
+    print(user_created_campsites or "campsites not bundled")
+    
 
     return render_template(
         "index.html",
@@ -125,7 +148,7 @@ def register():
                 connection.rollback()
             else:
                 connection.commit()
-                login_user(cursor.lastrowid)
+                login_user(User(user_ID=cursor.lastrowid))
 
         return redirect(url_for("app_blueprint.index"))
     session["register_form"] = register_form
@@ -152,7 +175,7 @@ def login():
                     
             
         return redirect(url_for("app_blueprint.index"))
-    session["login_form"] = login_form
+
     return redirect(url_for("app_blueprint.index", curr_modal="login-modal"))
 
 @login_required
@@ -166,7 +189,7 @@ def logout():
 @login_required
 @app_blueprint.route("/create", methods=["GET", "POST"])
 def create():
-    create_site_form = CreatSiteForm(current_app)
+    create_site_form = CreateSiteForm(current_app)
     if create_site_form.validate_on_submit():
         area_ID: int = create_site_form.area.data
         note: str = create_site_form.note.data
@@ -204,15 +227,14 @@ def create():
             else:
                 connection.commit()        
         return redirect(url_for("app_blueprint.index"))
-    session["create_site_form"] = create_site_form
-    return redirect(url_for("app_blueprint.index", curr_modal="create-site-modal"))
+    else:
+        return redirect(url_for("app_blueprint.index", curr_modal="create-site-modal"))
                     
                 
 @app_blueprint.route("/search-by-location", methods=["GET"])
 def search_by_location():
     search_type = request.args.get("search-type")
-    search_term = f"%{request.args.get('search-term')}%"
-    print(search_term, search_type)
+    search_term = f"%{request.args.get("search-term")}%"
     site_ids = campsite_manager.fetch_by_areas(current_app, search_type, search_term, 0, 9)
 
     if (len(site_ids) < 1):
@@ -225,7 +247,6 @@ def search_by_location():
         })
 
     sites = None
-    print(site_ids)
     with current_app.retrieve_db_connection() as (connection, cursor):
         try:
             cursor.execute(f"SELECT * FROM site WHERE site_ID IN {tuple(site_ids)}")
@@ -233,7 +254,6 @@ def search_by_location():
             logging.error(f"failure to retrieve site by location type and name from site : {e}")
         else:
             sites = [Campsite(current_app, **row).serialize() for row in cursor.fetchall()]
-    print(sites)
     return jsonify({
             "status": 200,
             "count": len(sites),
@@ -257,7 +277,7 @@ def campsite():
     login_form: LoginForm = session.pop("login_form", None) or LoginForm()
     login_form_handler: FormHandler = FormHandler(login_form)
 
-    create_site_form: CreatSiteForm = session.pop("create_site_form", None) or CreatSiteForm(current_app)
+    create_site_form: CreateSiteForm = session.pop("create_site_form", None) or CreateSiteForm(current_app)
 
     campsite_id = request.args.get("site_ID")
     if not campsite_id:
@@ -310,7 +330,6 @@ def comment_campsite():
     comment_site_form = CommentSiteForm()
     if comment_site_form.validate_on_submit():
         site_id = request.form.get("site_id")
-        print(site_id)
         comment = comment_site_form.comment.data
 
         with current_app.retrieve_db_connection() as (connection, cursor):

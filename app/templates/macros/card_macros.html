@@ -1,12 +1,14 @@
 {% include 'svgs/svgs.html' %}
 {% macro render_campsite(campsite) %}
 <div class="flex-col width-100 height-100 card">
-    <div class="flex-row flex-gap-lg flex-8" style="background-image: url('{{campsite.filepaths[0]}}'); background-position: center;">
+    <div class="flex-row flex-gap-lg flex-8"
+        style="background-image: url('{{campsite.filepaths[0]}}'); background-position: center; background-size:cover;">
+        {% if campsite.overall_score %}
         <div class="flex-row flex-gap-sm">
             {% for star in range(campsite.overall_score | int) %}
-                <svg width="25px" height="25px">
-                    <use href="#star-filled" />
-                </svg>
+            <svg width="25px" height="25px">
+                <use href="#star-filled" />
+            </svg>
             {% endfor %}
             {% for empty_star in range(10 - campsite.overall_score | int) %}
             <svg width="25px" height="25px">
@@ -14,11 +16,14 @@
             </svg>
             {%endfor%}
         </div>
+        {%else%}
+        <p>No ratings yet.</p>
+        {%endif%}
         <a href="/campsite?site_ID={{campsite.site_ID}}"><button class="button fit">Details</button></a>
     </div>
-    <div class="flex-2 background-primary">
+    <div class="flex flex-center flex-2 background-primary">
         <p>{{campsite.area['name']}}</p>
-        
+
     </div>
 </div>
 {% endmacro %}

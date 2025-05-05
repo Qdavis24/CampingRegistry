@@ -32,22 +32,14 @@ class CampsitesManager:
 
         self.area_map = {}
     
-    def process_raw_campsites(app, raw_campsites: list):
-        processed_campsites = []
-        for campsite in raw_campsites:
-            print(campsite)
-            new_campsite = Campsite(app, **campsite)
-            processed_campsites.append(new_campsite)
-        return processed_campsites
         
     def fetch_by_areas(self, app, search_type, search_term, offset, limit):
         if limit < 1:
             raise LimitError()
         if offset < 0:
             raise LimitError()
-
+        
         site_ids = None
-
         with app.retrieve_db_connection() as (connection, cursor):
             try:
                 cursor.execute(f"""SELECT s.*
@@ -55,7 +47,7 @@ class CampsitesManager:
                                   JOIN area as a 
                                   ON s.area_ID = a.area_ID
                                   WHERE a.{search_type} LIKE %s
-                                  LIMIT %s OFFSET %s""", (search_term, limit, offset))
+                                  LIMIT 1 OFFSET %s""", (search_term,offset))
             except Exception as e:
                 logging.error(f"failure to retrieve sites from location type and name : {e}")
             else:
@@ -81,7 +73,7 @@ class CampsitesManager:
             return self.area_map[area_id][offset:limit+offset]
         with app.retrieve_db_connection() as (connection, cursor):
             try:
-                cursor.execute(f"""SELECT s.site_ID
+                cursor.execute("""SELECT s.site_ID
                                     FROM site as s
                                     JOIN area as a ON s.site_ID = a.site_ID
                                     WHERE a.area_ID = %s
@@ -222,10 +214,13 @@ class Campsite:
             "cost_score": self.cost_score
         }
         self._clean_rating_scores()
-        self.filepaths = [row["filepath"] for row in self.filepaths]
-        self.area = self.area[0]
-        self.rules = [row["rule"] for row in self.rules] if len(self.rules) > 0 else []
-
+        if self.filepaths:
+            self.filepaths = [row["filepath"] for row in self.filepaths]
+        if self.area:
+            self.area = self.area[0]
+        if self.rules:
+            self.rules = [row["rule"] for row in self.rules] if len(self.rules) > 0 else []
+       
     def serialize(self):
         rating_category_scores = {
             "overall": self.overall_score,
@@ -237,6 +232,7 @@ class Campsite:
             "cost": self.cost_score
         }
         serialized_data = {
+            "site_ID": self.site_ID,
             "ratings" : rating_category_scores,
             "comments" : self.comments,
             "rules" : self.rules,
@@ -245,10 +241,13 @@ class Campsite:
         }
         return serialized_data
     
-    def _clean_rating_scores(self,):
+    def _clean_rating_scores(self):
         for attr, rating in self.rating_categories.items():
-            cleaned_number = float(list(rating[0].values())[0])
-            setattr(self, attr, cleaned_number)
+            if list(rating[0].values())[0]:
+                cleaned_number = float(list(rating[0].values())[0])
+                setattr(self, attr, cleaned_number)
+            else:
+                setattr(self, attr, None)
             
 
     def _fetch_related_data(self, app):
@@ -303,14 +302,13 @@ class Campsite:
                         JOIN site as s ON s.site_ID = sr.site_ID
                         WHERE sr.site_ID = %s;"""),
 
-            "area" : (self.area_ID, """SELECT name, state, county, street_address, zipcode 
+            "area" : (self.area_ID, """SELECT name, state, county, city, street_address, zipcode 
                         FROM area 
                         WHERE area_ID = %s""")
         }
         with app.retrieve_db_connection() as (connection, cursor):
             for attr, query in queries.items():
                 try:
-                    
                     cursor.execute(query[1], (query[0],))
                 except Exception as e:
                     logging.error(f"ERROR fetching {attr} for campsite {self.site_ID}: {e}")

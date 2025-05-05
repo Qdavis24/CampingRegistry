@@ -3,10 +3,13 @@
 {% block title %}Camping Registry{%endblock%}
 {% block content %}
 <div class="flex-col flex-center width-full-screen">
-    {% if highest_rated_campsites_by_overall | length >= 5 %}
-    <div class="flex-col flex-gap-lg flex-center width-full-screen background-secondary padding-lg">
+    {% if highest_rated_campsites_by_overall and highest_rated_campsites_by_overall | length >= 5 %}
+    <div class="flex flex-center background-primary width-full-screen padding-sm"
+        style="border-bottom:3px solid var(--accent-border-light)">
         <h2>Trending Sites.</h2>
-        <div class="flex-row flex-gap-sm r-container-large">
+    </div>
+    <div class="flex-col flex-gap-lg flex-center width-full-screen background-secondary padding-lg">
+        <div class="flex-row flex-gap-sm" style="height: 400px;">
             <div class="flex flex-4">
                 {{ render_campsite(highest_rated_campsites_by_overall[0]) }}
             </div>
@@ -32,6 +35,7 @@
 
         </div>
     </div>
+    {}
     {% endif %}
     {% if not current_user.is_authenticated %}
     <div class="flex-col flex-center width-full-screen" style="margin-top: 3rem;">
@@ -70,45 +74,48 @@
     </div>
     {%else%}
 
-        <div class="flex-row width-full-screen">
-            <div class="flex-col flex-4 form-container">
-                <div class="flex-1 padding-md flex-col flex-gap-md" style="border-bottom: 2px solid var(--accent-border-light)">
-                    <h2>Find Your Perfect Campsite.</h2>
+    <div class="flex-row width-full-screen">
+        <div class="flex-col flex-4 form-container">
+            <div class="flex-1 padding-md flex-col flex-gap-md"
+                style="border-bottom: 2px solid var(--accent-border-light)">
+                <h2>Find Your Perfect Campsite.</h2>
 
-                    <div class="flex-row flex-gap-md">
-                        <select id="search-type" class="form-field flex-3">
-                            <option value="city">City</option>
-                            <option value="state">State</option>
-                            <option value="zipcode">Zip Code</option>
-                            <option value="county">County</option>
-                        </select>
+                <div class="flex-row flex-gap-md">
+                    <select id="search-type" class="form-field flex-3">
+                        <option value="city">City</option>
+                        <option value="state">State</option>
+                        <option value="zipcode">Zip Code</option>
+                        <option value="county">County</option>
+                    </select>
 
-                        <input type="text" id="search-term" placeholder="Enter location..." class="form-field flex-7">
+                    <input type="text" id="search-term" placeholder="Enter location..." class="form-field flex-7">
 
-                        <button type="submit" class="button fit" onclick="searchCampsites()">Search</button>
-                    </div>
-                </div>
-                <div class="flex flex-9 flex-gap-lg" id="search-sites-container">
-            
+                    <button type="submit" class="button fit" onclick="searchCampsites()">Search</button>
                 </div>
             </div>
-        
-            <div class="background-primary flex-6 flex-col flex-center flex-gap-lg">
-                <div class="form-container flex flex-center background-primary flex-1 width-100">
-                    <h2 class="">Your Created Campsites.</h2>
-                </div>
-                <div class="flex-9 grid flex-gap-lg padding-sm">
-                    {% for site in user_created_campsites %}
-                    <div class="grid-item">
-                        {{render_campsite(site)}}
-                    </div>
+            <div class="flex flex-9 flex-gap-lg" id="search-sites-container">
 
-                    {% endfor %}
-                </div>
             </div>
-
         </div>
-    
+
+        <div class="background-primary flex-6 flex-col flex-center flex-gap-lg">
+            <div class="form-container flex flex-center background-primary flex-1 width-100">
+                <h2 class="">Your Created Campsites.</h2>
+            </div>
+            <div class="flex-9 grid-l flex-gap-lg padding-sm">
+                {% if user_created_campsites %}
+                {% for site in user_created_campsites %}
+                <div class="grid-item">
+                    {{render_campsite(site)}}
+                </div>
+
+                {% endfor %}
+                {%endif%}
+            </div>
+        </div>
+
+    </div>
+
     {%endif%}
 </div>
 <script>
@@ -116,11 +123,10 @@
     const searchTermEl = document.getElementById("search-term");
     const searchSitesContainer = document.getElementById("search-sites-container");
 
-    async function searchCampsites()
-    {
+    async function searchCampsites() {
         if (searchSitesContainer === null) return;
         while (searchSitesContainer.firstChild) {
-        searchSitesContainer.removeChild(searchSitesContainer.firstChild);
+            searchSitesContainer.removeChild(searchSitesContainer.firstChild);
         }
         const searchTypeVal = searchTypeEl ? searchTypeEl.value : null;
         const searchTermVal = searchTermEl ? searchTermEl.value : null;
@@ -133,8 +139,7 @@
 
         const data = await response.json();
 
-        if (!data || data["count"] < 1)
-        {
+        if (!data || data["count"] < 1) {
             searchSitesContainer.innerHTML = `<h2>No campsites found under location ${searchTypeVal} ${searchTermVal}</h2>`
             return;
         }
@@ -142,8 +147,8 @@
         const campsites = data["campsites"];
 
         const grid = document.createElement('div');
-        grid.className = "grid flex-gap-lg padding-lg";
-        campsites.forEach(function(campsite) {
+        grid.className = "grid-m flex-gap-lg padding-md";
+        campsites.forEach(function (campsite) {
             let newCard = buildCampsiteCard(campsite);
             grid.appendChild(newCard);
         });
@@ -151,31 +156,41 @@
         searchSitesContainer.appendChild(grid);
 
 
-        
+
 
 
     }
-    function buildCampsiteCard(campsite)
-    {
+    function buildCampsiteCard(campsite) {
         const newCard = document.createElement("div");
-        newCard.className = "flex-col card";
+        newCard.className = "flex-col flex-center background-primary fit";
 
         const avgStarRatingEl = buildCampsiteStars(Math.round(campsite['ratings']['overall']));
-    
+
+
         newCard.innerHTML = `
-        <div class="flex-col">
-        <div class="background-primary">
-            <p>${campsite["area"]["name"]}</p>
-            <div class="flex-row flex-gap-sm">
+            <div class="flex-col flex-gap-sm">
                 ${avgStarRatingEl.outerHTML}
+            </div>  
+            <a href="/campsite?site_ID=${campsite['site_ID']}"><button class="button fit">Details</button></a>      
             </div>
-        </div>
-        </div>
+            <div class="flex-col flex-gap-sm">
+
+            <p class="flex flex-5 flex-center">${campsite["area"]["name"]}</p>
+            
+            <div class="flex-col flex-gap-sm">
+                <p class="flex flex-5">${campsite["area"]["state"]}, ${campsite["area"]["county"]}, ${campsite["area"]["city"]}, ${campsite["area"]["zipcode"]}</p>
+            </div>
+            
+            
+            </div>
         `;
         return newCard;
     }
-    function buildCampsiteStars(rating)
-    {
+    function buildCampsiteStars(rating) {
+        const ratingContainer = document.createElement("div");
+        if (!rating) {
+            return ratingContainer;
+        }
         const filledStarSvgHTML = `<svg width="25px" height="25px">
                         <use href="#star-filled" />
                     </svg>`;
@@ -184,14 +199,12 @@
                         <use href="#star-empty" />
                     </svg>` ;
 
-        const ratingContainer = document.createElement("div");
+
         ratingContainer.className = "flex-row flex-gap-sm";
-        for (let i = 0; i < rating; i++)
-        {
+        for (let i = 0; i < rating; i++) {
             ratingContainer.innerHTML += filledStarSvgHTML;
         }
-        for (let i = 0; i < 10-rating; i++)
-        {
+        for (let i = 0; i < 10 - rating; i++) {
             ratingContainer.innerHTML += emptyStarSvgHTML;
         }
         return ratingContainer;

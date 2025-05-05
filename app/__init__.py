@@ -57,7 +57,7 @@ def create_app():
                 cursor: MySQLConnection.cursor = connection.cursor(dictionary=True)
                 yield connection, cursor
             except Exception as e:
-                logging.error(e)
+                logging.error(f"retrieve db connection failed : {e}")
             finally:
                 if cursor:
                     cursor.close()
@@ -74,7 +74,6 @@ def create_app():
                     cursor.execute("SELECT * FROM user WHERE user_ID = %s", (user_id,))
                     user_dict = cursor.fetchone()
                     user = User(**user_dict) if user_dict else None
-                    print(user)
                 except Exception as e:
                     print("here")
                     logging.error(f"failure to load user {e}")

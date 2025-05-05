@@ -40,8 +40,7 @@ p {
   font-size: 18px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 20px;
-  max-width: 800px;
+  margin: 0;
 }
 .rating-label {
   font-family: "Roboto", sans-serif;
@@ -128,10 +127,15 @@ p {
   font-family: "Roboto", sans-serif;
   color : white;
 }
-.grid {
+.grid-l {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 300px);
+}
+.grid-m {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
 }
 .top-left {
   position: absolute;

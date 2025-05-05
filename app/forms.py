@@ -64,9 +64,9 @@ class LoginForm(FlaskForm):
             raise ValidationError("Email must be valid email address.")
 # endregion
 
-class CreatSiteForm(FlaskForm):
-    area = SelectField('Area', validators=[DataRequired()], coerce=int)
-    note = TextAreaField('Note')
+class CreateSiteForm(FlaskForm):
+    area = SelectField('Area', validators=[DataRequired()])
+    note = TextAreaField('Note', validators=[DataRequired(), Length(min=10, max=250)])
     nightly_fee = DecimalField('Fee', validators=[DataRequired()], places=2)
     electrical = BooleanField('Electrical')
     restrooms = BooleanField('Restrooms')
@@ -77,7 +77,7 @@ class CreatSiteForm(FlaskForm):
     submit = SubmitField('Create Site')
     
     def __init__(self, app, *args, **kwargs):
-        super(CreatSiteForm, self).__init__(*args, **kwargs)
+        super(CreateSiteForm, self).__init__(*args, **kwargs)
         self.populate_area_choices(app)
     
     def populate_area_choices(self, app):

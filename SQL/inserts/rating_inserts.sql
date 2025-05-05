@@ -1,7 +1,4 @@
-
-
-DELETE FROM rating;
-
+SELECT * FROM rating;
 
 INSERT INTO rating (cleanliness, accessibility, quietness, activities, amenities, cost, site_ID) VALUES
 -- Ratings for Area 1 campsites
